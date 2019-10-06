@@ -16,6 +16,8 @@ import com.dps.custom_files.R
 import com.dps.custom_files.models.AlbumModel
 import java.util.*
 import kotlin.collections.ArrayList
+import android.graphics.Bitmap
+
 
 
 abstract class BaseActivity : AppCompatActivity(){
@@ -25,7 +27,9 @@ abstract class BaseActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         windowManager.defaultDisplay.getMetrics(displayMetrics)
+
     }
+
 
     fun checkForPermissions(vararg permissions:String):Boolean{
         var permissionGranted = true
@@ -44,7 +48,7 @@ abstract class BaseActivity : AppCompatActivity(){
         return permissionGranted
     }
     fun displayToast(message:String){
-        Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+        Toast.makeText(this@BaseActivity,message,Toast.LENGTH_LONG).show()
     }
 
     fun displayToast(stringRes:Int){
@@ -53,18 +57,22 @@ abstract class BaseActivity : AppCompatActivity(){
 
 
     companion object{
+
         @BindingAdapter("setBitmapImage")
         @JvmStatic
         fun setBitmapToImageView(imageView:ImageView,path:String){
-            //BitmapFactory.decodeFile(path)
+
             /*val stream = ByteArrayOutputStream()
             // Compress the bitmap with JPEG format and quality 20%
             bitmap.compress(Bitmap.CompressFormat.JPEG,20,stream)
             val byteArray = stream.toByteArray()
             val compressedBitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)*/
-            val thumbSize = 192
-            val bitmap  = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path), thumbSize, thumbSize)
+            val bitmapOptions = BitmapFactory.Options()
+            bitmapOptions.inSampleSize = 8
+            val thumbSize = 128
+            val bitmap  = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path,bitmapOptions), thumbSize, thumbSize)
             imageView.setImageBitmap(bitmap)
+
         }
 
         @BindingAdapter("setAlbumIcon")

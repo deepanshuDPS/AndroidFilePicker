@@ -5,11 +5,13 @@ import androidx.databinding.DataBindingUtil
 import com.dps.custom_files.R
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.content.Intent
 import android.os.Build
 import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUEST_CODE
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dps.custom_files.adapters.GalleryAdapter
 import com.dps.custom_files.databinding.ActivityImagesGalleryBinding
+import com.dps.custom_files.listeners.OnAlbumClickListener
 
 
 class ImagesGalleryActivity : BaseActivity() {
@@ -33,11 +35,15 @@ class ImagesGalleryActivity : BaseActivity() {
 
     private fun setRecyclerView() {
         val width = getDeviceWidth()/2 - 4
-        val galleryAdapter = GalleryAdapter(this,fetchAlbums(),width)
+        val galleryAdapter = GalleryAdapter(this,fetchAlbums(),width,object:OnAlbumClickListener{
+            override fun onAlbumClick(albumID: String) {
+                startActivity(Intent(this@ImagesGalleryActivity,AlbumsImagesActivity::class.java).putExtra("album_id",albumID))
+            }
+
+        })
         binding?.apply {
             rvAlbums?.layoutManager = GridLayoutManager(this@ImagesGalleryActivity,2)
             rvAlbums.adapter = galleryAdapter
-            rvAlbums.setHasFixedSize(true)
         }
     }
 

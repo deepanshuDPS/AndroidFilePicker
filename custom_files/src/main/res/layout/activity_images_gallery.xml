@@ -17,15 +17,14 @@
             app:title="@string/gallery"
             app:titleTextColor="@android:color/white" />
 
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_albums"
+                android:descendantFocusability="blocksDescendants"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-        </androidx.core.widget.NestedScrollView>
+
 
     </LinearLayout>
 </layout>

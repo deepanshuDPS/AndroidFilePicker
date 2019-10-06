@@ -16,14 +16,10 @@
         android:background="@color/colorPrimary"
         app:navigationIcon="@drawable/ic_back"
         app:titleTextColor="@android:color/white" />
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_images"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</androidx.core.widget.NestedScrollView>
-
+        android:layout_height="wrap_content"
+        android:descendantFocusability="blocksDescendants"/>
 </LinearLayout>
 </layout>
