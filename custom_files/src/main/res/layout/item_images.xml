@@ -1,42 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <data>
 
         <variable
             name="image"
             type="com.dps.custom_files.models.ImagesModel" />
     </data>
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elevation="@dimen/_1sdp"
-            android:padding="@dimen/_1sdp">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_last_image"
-                android:layout_width="@dimen/_100sdp"
-                android:layout_height="@dimen/_100sdp"
-                android:background="@android:color/black"
-                android:scaleType="centerCrop"
-                app:setBitmapImage="@{image.imagePath}" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="@dimen/_18sdp"
-                android:layout_height="@dimen/_18sdp"
-                android:layout_gravity="bottom"
-                android:layout_margin="@dimen/_3sdp"
-                android:background="@drawable/ic_image" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_margin="@dimen/_3sdp"
-                android:text="@{image.imageSize}"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/_12sdp" />
-
-        </FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_image"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:layout_marginTop="@dimen/_1sdp"
+        android:scaleType="centerCrop"
+        android:background="@android:color/white"
+        app:path="@{image.imagePath}"
+        app:imageSize="@{image.imageSize}"/>
+    </LinearLayout>
 </layout>

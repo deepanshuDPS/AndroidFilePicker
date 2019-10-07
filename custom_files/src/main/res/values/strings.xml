@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">CustomFiles</string>
     <string name="gallery">Gallery</string>
+
+    <string name="permissions_not_granted">"All Permissions Not Granted"</string>
+    <string name="documents">Documents</string>
 </resources>

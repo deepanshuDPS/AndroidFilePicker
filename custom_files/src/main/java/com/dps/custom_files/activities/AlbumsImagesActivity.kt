@@ -3,61 +3,91 @@ package com.dps.custom_files.activities
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dps.custom_files.R
-import com.dps.custom_files.adapters.GalleryAdapter
-import com.dps.custom_files.adapters.ImagesAdapter
+import com.dps.custom_files.adapters.DatesAdapter
+import com.dps.custom_files.app_helper.Utilities
 import com.dps.custom_files.databinding.ActivityAlbumsImagesBinding
-import com.dps.custom_files.models.ImagesModel
+import kotlin.collections.ArrayList
+
+
+
 
 class AlbumsImagesActivity : BaseActivity() {
 
-    private var binding:ActivityAlbumsImagesBinding?=null
+    private var allDates: ArrayList<String>?=null
+    private var allImages: LinkedHashMap<String, ArrayList<String>>? =null
+    private var binding: ActivityAlbumsImagesBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_albums_images)
 
         setSupportActionBar(binding?.toolbarImages)
-        supportActionBar?.title = "Camera"
+        supportActionBar?.title = intent.extras?.getString("album_name")
+
+        binding?.toolbarImages?.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
         val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val selection =
-            MediaStore.Images.Media.BUCKET_ID + "='" + intent.getStringExtra("album_id") + "'"
+            MediaStore.Images.Media.BUCKET_ID + "='${intent.extras?.getString("album_id")}'"
         val orderBy = "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
         val albumsImagesCursor = contentResolver.query(
             imagesUri,
             arrayOf(
                 MediaStore.Images.Media.DATA,
-                MediaStore.Images.Media.SIZE,
                 MediaStore.Images.Media.DATE_MODIFIED
             ),
             selection,
             null,
             orderBy
         )
+
+        var previousDate = "null"
+        allImages = LinkedHashMap()
+        allDates = ArrayList()
+
         if (albumsImagesCursor != null) {
-            val imagesList = ArrayList<ImagesModel>()
             while (albumsImagesCursor.moveToNext()) {
+
+                val timeInMillis: Long = albumsImagesCursor.getString(
+                    albumsImagesCursor.getColumnIndex(
+                        MediaStore.Images.Media.DATE_MODIFIED
+                    )
+                ).toLong() * 1000
                 val imagePath =
                     albumsImagesCursor.getString(albumsImagesCursor.getColumnIndex(MediaStore.Images.Media.DATA))
-                val imageSize =
-                    albumsImagesCursor.getString(albumsImagesCursor.getColumnIndex(MediaStore.Images.Media.SIZE))
-                val imageModel = ImagesModel("", imageSize, imagePath)
-                imagesList.add(imageModel)
+                val date = Utilities.getDateFromData(timeInMillis)
+                val size = allImages?.size
+                if (size == 0 || date != previousDate) {
+                    allDates?.add(date)
+                    allImages!![date] = ArrayList()
+                    allImages!![date]?.add(imagePath)
+                } else
+                    allImages!![previousDate]?.add(imagePath)
+
+                previousDate = date
             }
             albumsImagesCursor.close()
-            setRecyclerView(imagesList)
         }
+
     }
 
-    private fun setRecyclerView(imagesList:ArrayList<ImagesModel>) {
-        val width = getDeviceWidth()/2 - 4
-        val galleryAdapter = ImagesAdapter(this,imagesList,width)
+
+    override fun onResume() {
+        super.onResume()
+        setRecyclerView()
+    }
+
+    private fun setRecyclerView() {
+        val width = getDeviceWidth() / 4 - 2
+        val datesAdapter = DatesAdapter(this,allDates!!,allImages!!, width)
         binding?.apply {
-            rvImages?.layoutManager = GridLayoutManager(this@AlbumsImagesActivity,2)
-            rvImages.adapter = galleryAdapter
-            rvImages.setHasFixedSize(true)
+            rvImages.adapter = datesAdapter
+            val layoutManager =LinearLayoutManager(this@AlbumsImagesActivity)
+            rvImages.layoutManager = layoutManager
         }
     }
 }

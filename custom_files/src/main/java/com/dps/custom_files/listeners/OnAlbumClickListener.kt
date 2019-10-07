@@ -1,5 +1,5 @@
 package com.dps.custom_files.listeners
 
 interface OnAlbumClickListener {
-    fun onAlbumClick(albumID:String)
+    fun onAlbumClick(albumID:String,albumName:String)
 }
