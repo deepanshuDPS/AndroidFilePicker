@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -14,14 +15,14 @@
         android:layout_width="match_parent"
         android:focusable="true"
         android:clickable="true"
-        android:layout_marginTop="@dimen/_2sdp"
-        android:background="@drawable/bg_white_ripple">
+        app:setBackgroundToLayout="@{document.checked}"
+        android:paddingTop="@dimen/_2sdp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="@dimen/_3sdp"
+            android:layout_margin="@dimen/_3sdp"
             android:gravity="center">
 
         <ImageView

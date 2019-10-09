@@ -8,11 +8,26 @@ import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUES
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.app.Activity
+import android.content.Intent
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dps.custom_files.adapters.DocumentsAdapter
+import com.dps.custom_files.app_helper.MimeTypes
+import com.dps.custom_files.listeners.IsAnyCheckedListener
+import com.dps.custom_files.listeners.OnFileSelectedListener
+import com.dps.custom_files.models.DocumentModel
 import kotlinx.android.synthetic.main.activity_documents.*
 
 class DocumentsActivity : BaseActivity() {
+
+    private var documentsAdapter: DocumentsAdapter? = null
+    private var documentsList: ArrayList<DocumentModel>? = null
+    private var count = 0
+    private var actionMode: ActionMode? = null
+    private var isChecked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +52,38 @@ class DocumentsActivity : BaseActivity() {
     }
 
     private fun setRecyclerView() {
-        val documentsAdapter = DocumentsAdapter(this,fetchDocuments())
+        documentsList = fetchDocuments(arrayOf(MimeTypes.PDF))
+        documentsAdapter = DocumentsAdapter(this, documentsList!!,isChecked, object : IsAnyCheckedListener {
+            override fun isAnyChecked(checked: Boolean) {
+                if (checked) count += 1 else count -= 1
+                // show action mode here
+                isChecked = checked
+                if(!isChecked) {
+                    for (i in 0 until documentsList!!.size) {
+                        if (documentsList!![i].isChecked) {
+                            isChecked = true
+                            break
+                        }
+                    }
+                }
+                documentsAdapter?.setChecked(isChecked)
+                documentsAdapter?.notifyDataSetChanged()
+                if (isChecked) showActionMode(count)
+                else hideActionMode()
+            }
+
+        },object :OnFileSelectedListener{
+            override fun onFileSelected(filePath: String) {
+                val selectedFilesList = ArrayList<String>()
+                selectedFilesList.add(filePath)
+                val intent = Intent()
+                intent.putExtra("files_path",selectedFilesList)
+                setResult(Activity.RESULT_OK,intent)
+                finish()
+            }
+
+        })
+        documentsAdapter?.setHasStableIds(true)
         rv_documents.layoutManager = LinearLayoutManager(this)
         rv_documents.adapter = documentsAdapter
     }
@@ -56,5 +102,56 @@ class DocumentsActivity : BaseActivity() {
                     displayToast(R.string.permissions_not_granted)
             }
         }
+    }
+
+    private fun hideActionMode() {
+        actionMode?.finish()
+        actionMode = null
+    }
+
+    private fun showActionMode(count: Int) {
+        if (actionMode == null)
+            actionMode = this@DocumentsActivity.startSupportActionMode(ActionBarCallback())
+
+        actionMode?.title = "$count Selected"
+    }
+
+    // action mode for select multiple
+    inner class ActionBarCallback : ActionMode.Callback {
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem): Boolean {
+
+            // multiple files selected action here
+            val intent = Intent()
+            intent.putExtra("files_path", getSelectedFiles())
+            setResult(Activity.RESULT_OK, intent)
+            finish()
+            return true
+        }
+
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_mulitple_select, menu)
+
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            mode?.finish()
+            count = 0
+            documentsAdapter?.clearAllChecked()
+            hideActionMode()
+        }
+    }
+
+    private fun getSelectedFiles(): ArrayList<String> {
+
+        val selectedFilesList = ArrayList<String>()
+        for (i in documentsList!!)
+            if (i.isChecked)
+                selectedFilesList.add(i.filePath)
+        return selectedFilesList
     }
 }

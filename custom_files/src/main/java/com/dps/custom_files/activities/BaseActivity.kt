@@ -2,6 +2,7 @@ package com.dps.custom_files.activities
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -18,6 +19,7 @@ import kotlin.collections.ArrayList
 import com.bumptech.glide.Glide
 import java.io.File
 import android.webkit.MimeTypeMap
+import android.widget.LinearLayout
 import com.dps.custom_files.app_helper.Utilities
 import com.dps.custom_files.models.DocumentModel
 
@@ -113,6 +115,16 @@ abstract class BaseActivity : AppCompatActivity() {
             }
 
         }
+
+        @BindingAdapter("setBackgroundToLayout")
+        @JvmStatic
+        fun setBackground(linearLayout: LinearLayout, isChecked:Boolean) {
+            if(isChecked)
+                linearLayout.setBackgroundResource(R.drawable.bg_grey_ripple)
+            else
+                linearLayout.setBackgroundResource(R.drawable.bg_white_ripple)
+
+        }
     }
 
     fun fetchImagesAlbums(): ArrayList<AlbumModel> {
@@ -183,9 +195,9 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
 
-    fun fetchDocuments(): ArrayList<DocumentModel> {
+    fun fetchDocuments(mimeTypeList:Array<String>): ArrayList<DocumentModel> {
         val documentList = ArrayList<DocumentModel>()
-        val pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf")
+        /*val pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf")
         val doc = MimeTypeMap.getSingleton().getMimeTypeFromExtension("doc")
         val docx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("docx")
         val xls = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xls")
@@ -193,8 +205,11 @@ abstract class BaseActivity : AppCompatActivity() {
         val ppt = MimeTypeMap.getSingleton().getMimeTypeFromExtension("ppt")
         val pptx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pptx")
         val txt = MimeTypeMap.getSingleton().getMimeTypeFromExtension("txt")
-        val html = MimeTypeMap.getSingleton().getMimeTypeFromExtension("html")
-
+        val html = MimeTypeMap.getSingleton().getMimeTypeFromExtension("html")*/
+        var nArgs = "("
+        for(i in mimeTypeList)
+            nArgs+="?,"
+        nArgs = nArgs.substring(0,nArgs.length-1) + ") "
         val filesUri = MediaStore.Files.getContentUri("external")
         val projection = arrayOf(
             MediaStore.Files.FileColumns.DATA,
@@ -203,12 +218,12 @@ abstract class BaseActivity : AppCompatActivity() {
             MediaStore.Files.FileColumns.SIZE
         )
 
-        val selection = MediaStore.Files.FileColumns.MIME_TYPE + " IN (?,?,?,?,?,?,?,?,?) "
+        val selection = MediaStore.Files.FileColumns.MIME_TYPE + " IN $nArgs "
 
         val orderBy = "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC"
-        val args = arrayOf(pdf, doc, docx, xls, xlsx, ppt, pptx, txt, html)
+       // val args = arrayOf(pdf, doc, docx, xls, xlsx, ppt, pptx, txt, html)
 
-        val filesCursor = contentResolver.query(filesUri, projection, selection, args, orderBy)
+        val filesCursor = contentResolver.query(filesUri, projection, selection, mimeTypeList, orderBy)
 
         if (filesCursor != null) {
             while (filesCursor.moveToNext()) {
@@ -231,7 +246,7 @@ abstract class BaseActivity : AppCompatActivity() {
                             filePath,
                             fileSize,
                             Utilities.getTimeFromData(timeInMillis),
-                            mimeType
+                            mimeType,false
                         )
                     )
                 else
@@ -241,7 +256,7 @@ abstract class BaseActivity : AppCompatActivity() {
                             filePath,
                             fileSize,
                             Utilities.getSlashedDateFromData(timeInMillis),
-                            mimeType
+                            mimeType,false
                         )
                     )
             }

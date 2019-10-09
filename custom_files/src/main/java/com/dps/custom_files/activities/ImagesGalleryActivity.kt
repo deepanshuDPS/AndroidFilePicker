@@ -5,11 +5,13 @@ import androidx.databinding.DataBindingUtil
 import com.dps.custom_files.R
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUEST_CODE
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dps.custom_files.adapters.GalleryAdapter
+import com.dps.custom_files.app_helper.AppConstants.GALLERY_IMAGES_REQUEST_CODE
 import com.dps.custom_files.databinding.ActivityImagesGalleryBinding
 import com.dps.custom_files.listeners.OnAlbumClickListener
 
@@ -45,7 +47,8 @@ class ImagesGalleryActivity : BaseActivity() {
                     val bundle = Bundle()
                     bundle.putString("album_id",albumID)
                     bundle.putString("album_name",albumName)
-                    switchActivity(AlbumsImagesActivity::class.java,bundle)
+                    //switchActivity(AlbumsImagesActivity::class.java,bundle)
+                    startActivityForResult(Intent(this@ImagesGalleryActivity,AlbumsImagesActivity::class.java).putExtras(bundle),GALLERY_IMAGES_REQUEST_CODE)
                 }
 
             })
@@ -68,6 +71,18 @@ class ImagesGalleryActivity : BaseActivity() {
                     setRecyclerView()
                 else
                     displayToast(R.string.permissions_not_granted)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(data!=null && resultCode== Activity.RESULT_OK){
+            if(requestCode==GALLERY_IMAGES_REQUEST_CODE){
+                val intent = Intent()
+                intent.putExtra("files_path", data.extras?.getStringArrayList("files_path"))
+                setResult(Activity.RESULT_OK,intent)
+                finish()
             }
         }
     }

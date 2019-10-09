@@ -11,7 +11,8 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_gallery"
-            android:elevation="@dimen/_1sdp"
+            app:contentInsetStartWithNavigation="0dp"
+            android:elevation="@dimen/_2sdp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
