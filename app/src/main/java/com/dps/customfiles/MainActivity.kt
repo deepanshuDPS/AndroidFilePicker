@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import com.dps.custom_files.activities.DocumentsActivity
 import com.dps.custom_files.activities.ImagesGalleryActivity
+import com.dps.custom_files.app_helper.MimeTypes
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,11 +18,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onGalleryClick(view: View) {
-        startActivityForResult(Intent(this, ImagesGalleryActivity::class.java), 202)
+        val intent = Intent(this, ImagesGalleryActivity::class.java)
+        intent.action = Intent.EXTRA_ALLOW_MULTIPLE
+        startActivityForResult(intent, 202)
     }
 
     fun onDocClick(view: View) {
-        startActivityForResult(Intent(this, DocumentsActivity::class.java), 303)
+        val intent = Intent(this, DocumentsActivity::class.java)
+        intent.action = Intent.EXTRA_ALLOW_MULTIPLE
+        intent.putExtra(MimeTypes.SELECTED_TYPES,arrayOf(MimeTypes.PDF,MimeTypes.IMAGE_PNG))
+        startActivityForResult(intent, 303)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

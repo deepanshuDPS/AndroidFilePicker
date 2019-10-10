@@ -2,6 +2,7 @@ package com.dps.custom_files.app_helper
 
 object MimeTypes {
 
+    const val SELECTED_TYPES = "selected_types"
     const val PDF = "application/pdf"
     const val DOC = "application/msword"
     const val DOC_X = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"

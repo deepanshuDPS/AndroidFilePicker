@@ -18,7 +18,8 @@ class ImagesAdapter(
     private var width: Int,
     private var isChecked: Boolean,
     private var isAnyCheckedListener: IsAnyCheckedListener,
-    private var onFileSelectedListener: OnFileSelectedListener
+    private var onFileSelectedListener: OnFileSelectedListener,
+    private var isMultipleAllowed:Boolean
 ) : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,6 +31,14 @@ class ImagesAdapter(
     }
 
     override fun getItemCount() = imagesList.size
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val imagesModel = imagesList[position]
@@ -63,7 +72,8 @@ class ImagesAdapter(
             }
 
             binding.root.setOnLongClickListener {
-                makeCheckable()
+                if(isMultipleAllowed)
+                    makeCheckable()
                 return@setOnLongClickListener true
             }
 

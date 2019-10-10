@@ -2,7 +2,6 @@ package com.dps.custom_files.activities
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -18,8 +17,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 import com.bumptech.glide.Glide
 import java.io.File
-import android.webkit.MimeTypeMap
 import android.widget.LinearLayout
+import com.dps.custom_files.app_helper.MimeTypes
 import com.dps.custom_files.app_helper.Utilities
 import com.dps.custom_files.models.DocumentModel
 
@@ -99,18 +98,25 @@ abstract class BaseActivity : AppCompatActivity() {
         fun setFileIcon(imageView: ImageView, mimeType: String) {
 
             when (mimeType) {
-                "application/pdf" -> imageView.setImageResource(R.drawable.ic_pdf)
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword" -> imageView.setImageResource(
+                MimeTypes.PDF -> imageView.setImageResource(R.drawable.ic_pdf)
+                MimeTypes.DOC,MimeTypes.DOC_X -> imageView.setImageResource(
                     R.drawable.ic_doc
                 )
-                "text/plain" -> imageView.setImageResource(R.drawable.ic_txt)
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.ms-powerpoint" -> imageView.setImageResource(
+                MimeTypes.TXT -> imageView.setImageResource(R.drawable.ic_txt)
+                MimeTypes.PPT,MimeTypes.PPT_X -> imageView.setImageResource(
                     R.drawable.ic_ppt
                 )
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel" -> imageView.setImageResource(
+                MimeTypes.XLS,MimeTypes.XLS_X -> imageView.setImageResource(
                     R.drawable.ic_xls
                 )
-                "text/html" -> imageView.setImageResource(R.drawable.ic_html)
+                MimeTypes.HTML -> imageView.setImageResource(R.drawable.ic_html)
+                MimeTypes.IMAGE_PNG -> imageView.setImageResource(R.drawable.ic_png)
+                MimeTypes.IMAGE_JPEG -> imageView.setImageResource(R.drawable.ic_jpg)
+                MimeTypes.IMAGE_GIF -> imageView.setImageResource(R.drawable.ic_gif)
+                MimeTypes.IMAGE_BMP-> imageView.setImageResource(R.drawable.ic_bmp)
+                MimeTypes.IMAGE_SVG -> imageView.setImageResource(R.drawable.ic_svg)
+                MimeTypes.AUDIO_MP3,MimeTypes.AUDIO_OGG,MimeTypes.AUDIO_WAV -> imageView.setImageResource(R.drawable.ic_music)
+                MimeTypes.VIDEO_MOV,MimeTypes.VIDEO_AVI,MimeTypes.VIDEO_3GP,MimeTypes.VIDEO_MP4,MimeTypes.VIDEO_MPEG -> imageView.setImageResource(R.drawable.ic_video)
                 else -> imageView.setImageResource(R.drawable.ic_unknown)
             }
 
@@ -197,15 +203,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun fetchDocuments(mimeTypeList:Array<String>): ArrayList<DocumentModel> {
         val documentList = ArrayList<DocumentModel>()
-        /*val pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf")
-        val doc = MimeTypeMap.getSingleton().getMimeTypeFromExtension("doc")
-        val docx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("docx")
-        val xls = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xls")
-        val xlsx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xlsx")
-        val ppt = MimeTypeMap.getSingleton().getMimeTypeFromExtension("ppt")
-        val pptx = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pptx")
-        val txt = MimeTypeMap.getSingleton().getMimeTypeFromExtension("txt")
-        val html = MimeTypeMap.getSingleton().getMimeTypeFromExtension("html")*/
+
+        /*val pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf")*/
+
         var nArgs = "("
         for(i in mimeTypeList)
             nArgs+="?,"

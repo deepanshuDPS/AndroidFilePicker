@@ -2,7 +2,6 @@ package com.dps.custom_files.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
@@ -10,6 +9,7 @@ import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dps.custom_files.R
 import com.dps.custom_files.adapters.DatesAdapter
 import com.dps.custom_files.app_helper.Utilities
@@ -22,6 +22,7 @@ import kotlin.collections.ArrayList
 
 class AlbumsImagesActivity : BaseActivity() {
 
+    private var multiSelect = false
     private var datesAdapter: DatesAdapter? = null
     private var allDates: ArrayList<String>? = null
     private var allImages: LinkedHashMap<String, ArrayList<ImagesModel>>? = null
@@ -31,9 +32,10 @@ class AlbumsImagesActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_albums_images)
-
         setSupportActionBar(binding?.toolbarImages)
         supportActionBar?.title = intent.extras?.getString("album_name")
+
+        multiSelect = intent.getBooleanExtra("is_multiple",false)
 
         binding?.toolbarImages?.setNavigationOnClickListener {
             onBackPressed()
@@ -116,12 +118,17 @@ class AlbumsImagesActivity : BaseActivity() {
                     setResult(Activity.RESULT_OK,intent)
                     finish()
                 }
-            })
+            },multiSelect)
 
         binding?.apply {
-            rvImages.adapter = datesAdapter
+            datesAdapter?.setHasStableIds(true)
+            rvImagesDate.adapter = datesAdapter
             val layoutManager = LinearLayoutManager(this@AlbumsImagesActivity)
-            rvImages.layoutManager = layoutManager
+            rvImagesDate.layoutManager = layoutManager
+            val animator = rvImagesDate.getItemAnimator()
+            if (animator is SimpleItemAnimator) {
+                animator.supportsChangeAnimations = false
+            }
         }
     }
 

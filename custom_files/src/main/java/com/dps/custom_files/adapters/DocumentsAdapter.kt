@@ -10,16 +10,21 @@ import com.dps.custom_files.databinding.ItemDocumentBinding
 import com.dps.custom_files.listeners.IsAnyCheckedListener
 import com.dps.custom_files.listeners.OnFileSelectedListener
 import com.dps.custom_files.models.DocumentModel
-
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DocumentsAdapter(
     private var context: Context,
     private var documentsList: ArrayList<DocumentModel>,
+    private var documentsSearchList: ArrayList<DocumentModel>,
     private var isChecked:Boolean,
     private var isAnyCheckedListener: IsAnyCheckedListener,
-    private var onFileSelectedListener: OnFileSelectedListener
+    private var onFileSelectedListener: OnFileSelectedListener,
+    private var isMultipleAllowed:Boolean
 ) : RecyclerView.Adapter<DocumentsAdapter.ViewHolder>() {
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = DataBindingUtil.inflate(
@@ -31,15 +36,15 @@ class DocumentsAdapter(
         return ViewHolder(binding)
     }
 
-    override fun getItemCount() = documentsList.size
+    override fun getItemCount() = documentsSearchList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.binding.document = documentsList[position]
-        holder.bindOnClickListeners(documentsList[position])
+        holder.binding.document = documentsSearchList[position]
+        holder.bindOnClickListeners(documentsSearchList[position])
     }
 
     fun clearAllChecked() {
-        for (i in documentsList)
+        for (i in documentsSearchList)
             i.isChecked = false
         isChecked = false
         notifyDataSetChanged()
@@ -57,6 +62,21 @@ class DocumentsAdapter(
         return position
     }
 
+    fun searchDocs(searchQuery:String){
+
+        documentsSearchList = ArrayList()
+        if(searchQuery != ""){
+            for(i in documentsList){
+                if(i.fileName.toLowerCase(Locale.ENGLISH).contains(searchQuery.toLowerCase(Locale.ENGLISH))){
+                    documentsSearchList.add(i)
+                }
+            }
+        }
+        else
+            documentsSearchList.addAll(documentsList)
+        notifyDataSetChanged()
+    }
+
     inner class ViewHolder(var binding: ItemDocumentBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -68,7 +88,8 @@ class DocumentsAdapter(
             }
 
             binding.root.setOnLongClickListener {
-                makeCheckable()
+                if(isMultipleAllowed)
+                    makeCheckable()
                 return@setOnLongClickListener true
             }
 

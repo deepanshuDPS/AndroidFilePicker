@@ -13,6 +13,8 @@ import com.dps.custom_files.listeners.IsAnyCheckedListener
 import com.dps.custom_files.listeners.OnFileSelectedListener
 import com.dps.custom_files.listeners.OnMultipleFilesSelectionListener
 import com.dps.custom_files.models.ImagesModel
+import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 
 class DatesAdapter(
     private var context: Context,
@@ -20,7 +22,8 @@ class DatesAdapter(
     private var allImagesList: LinkedHashMap<String, ArrayList<ImagesModel>>,
     private var width: Int,
     private var onMultipleFilesSelectionListener: OnMultipleFilesSelectionListener,
-    private var onFileSelectedListener: OnFileSelectedListener
+    private var onFileSelectedListener: OnFileSelectedListener,
+    private var isMultipleAllowed:Boolean
 ) : RecyclerView.Adapter<DatesAdapter.ViewHolder>() {
 
     private var isCheckedMain = false
@@ -37,12 +40,10 @@ class DatesAdapter(
     override fun getItemCount() = dateList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var date = dateList[position]
+        var dateToSet = dateList[position]
         val currentYear = Utilities.getCurrentYear()
-        if (date.contains(currentYear))
-            date = date.replace(", $currentYear", "")
-
-        holder.binding.date = date
+        if (dateToSet.contains(currentYear))
+            dateToSet = dateToSet.replace(", $currentYear", "")
         // set up recycler view
         val imagesList = allImagesList[dateList[position]]!!
         val isAnyCheckedListener = object : IsAnyCheckedListener {
@@ -74,9 +75,22 @@ class DatesAdapter(
             }
         }
 
-        val imagesAdapter = ImagesAdapter(context, imagesList, width, isCheckedMain, isAnyCheckedListener,onFileSelectedListener)
-        holder.binding.rvImages.adapter = imagesAdapter
-        holder.binding.rvImages.layoutManager = GridLayoutManager(context, 3)
+        val imagesAdapter = ImagesAdapter(context, imagesList, width, isCheckedMain, isAnyCheckedListener,onFileSelectedListener,isMultipleAllowed)
+        holder.binding.apply {
+            date = dateToSet
+            imagesAdapter.setHasStableIds(true)
+            rvImages.adapter = imagesAdapter
+            rvImages.layoutManager = GridLayoutManager(context, 3)
+
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
     fun clearAllChecked(){

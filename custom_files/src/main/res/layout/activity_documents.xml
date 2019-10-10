@@ -1,29 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@android:color/white"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     tools:context=".activities.DocumentsActivity">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_documents"
-        app:contentInsetStartWithNavigation="0dp"
-        android:elevation="@dimen/_2sdp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_back"
         android:background="@color/colorPrimary"
+        android:elevation="@dimen/_2sdp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:navigationIcon="@drawable/ic_back"
         app:title="@string/documents"
-        app:titleTextColor="@android:color/white"
-        />
+        app:titleTextColor="@android:color/white">
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/white"
+            android:hint="@string/search"
+            android:maxLines="1"
+            android:textColor="@android:color/white"
+            android:textColorHint="@color/white_trans"
+            android:textSize="18sp"
+            android:visibility="gone" />
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_documents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:descendantFocusability="afterDescendants"/>
+        android:descendantFocusability="afterDescendants" />
 
 </LinearLayout>

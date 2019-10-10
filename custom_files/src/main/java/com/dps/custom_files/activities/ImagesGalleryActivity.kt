@@ -19,16 +19,24 @@ import com.dps.custom_files.listeners.OnAlbumClickListener
 class ImagesGalleryActivity : BaseActivity() {
 
     private var binding: ActivityImagesGalleryBinding? = null
+    private var multiSelect = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_images_gallery)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkForPermissions(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE)) {
-                requestPermissions(
-                    arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE),
-                    READ_WRITE_PERMISSION_REQUEST_CODE
-                )
+        val action = intent.action
+        multiSelect = (action != null && action == Intent.EXTRA_ALLOW_MULTIPLE)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkForPermissions(
+                WRITE_EXTERNAL_STORAGE,
+                READ_EXTERNAL_STORAGE
+            )
+        ) {
+            requestPermissions(
+                arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE),
+                READ_WRITE_PERMISSION_REQUEST_CODE
+            )
 
         } else
             setRecyclerView()
@@ -43,12 +51,18 @@ class ImagesGalleryActivity : BaseActivity() {
         val width = getDeviceWidth() / 2 - 4
         val galleryAdapter =
             GalleryAdapter(this, fetchImagesAlbums(), width, object : OnAlbumClickListener {
-                override fun onAlbumClick(albumID: String,albumName:String) {
+                override fun onAlbumClick(albumID: String, albumName: String) {
                     val bundle = Bundle()
-                    bundle.putString("album_id",albumID)
-                    bundle.putString("album_name",albumName)
+                    bundle.putString("album_id", albumID)
+                    bundle.putString("album_name", albumName)
+                    bundle.putBoolean("is_multiple", multiSelect)
                     //switchActivity(AlbumsImagesActivity::class.java,bundle)
-                    startActivityForResult(Intent(this@ImagesGalleryActivity,AlbumsImagesActivity::class.java).putExtras(bundle),GALLERY_IMAGES_REQUEST_CODE)
+                    startActivityForResult(
+                        Intent(
+                            this@ImagesGalleryActivity,
+                            AlbumsImagesActivity::class.java
+                        ).putExtras(bundle), GALLERY_IMAGES_REQUEST_CODE
+                    )
                 }
 
             })
@@ -77,11 +91,11 @@ class ImagesGalleryActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(data!=null && resultCode== Activity.RESULT_OK){
-            if(requestCode==GALLERY_IMAGES_REQUEST_CODE){
+        if (data != null && resultCode == Activity.RESULT_OK) {
+            if (requestCode == GALLERY_IMAGES_REQUEST_CODE) {
                 val intent = Intent()
                 intent.putExtra("files_path", data.extras?.getStringArrayList("files_path"))
-                setResult(Activity.RESULT_OK,intent)
+                setResult(Activity.RESULT_OK, intent)
                 finish()
             }
         }

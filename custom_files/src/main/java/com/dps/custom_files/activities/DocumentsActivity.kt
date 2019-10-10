@@ -1,6 +1,5 @@
 package com.dps.custom_files.activities
 
-
 import android.os.Build
 import android.os.Bundle
 import com.dps.custom_files.R
@@ -12,7 +11,9 @@ import android.app.Activity
 import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.view.ActionMode
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dps.custom_files.adapters.DocumentsAdapter
 import com.dps.custom_files.app_helper.MimeTypes
@@ -23,15 +24,24 @@ import kotlinx.android.synthetic.main.activity_documents.*
 
 class DocumentsActivity : BaseActivity() {
 
+    private var mimeTypes: Array<String>?=null
     private var documentsAdapter: DocumentsAdapter? = null
     private var documentsList: ArrayList<DocumentModel>? = null
     private var count = 0
     private var actionMode: ActionMode? = null
     private var isChecked = false
+    private var isSearch = false
+    private var multiSelect = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_documents)
+        setSupportActionBar(toolbar_documents)
+
+        mimeTypes = intent.getStringArrayExtra(MimeTypes.SELECTED_TYPES)
+        val action = intent.action
+        multiSelect = (action!=null && action == Intent.EXTRA_ALLOW_MULTIPLE)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkForPermissions(
                 WRITE_EXTERNAL_STORAGE,
                 READ_EXTERNAL_STORAGE
@@ -47,42 +57,81 @@ class DocumentsActivity : BaseActivity() {
             setRecyclerView()
 
         toolbar_documents.setNavigationOnClickListener {
-            onBackPressed()
+            if (isSearch) {
+                isSearch = false
+                invalidateOptionsMenu()
+            } else onBackPressed()
+        }
+
+        toolbar_documents.setOnMenuItemClickListener {
+
+            when (it.itemId) {
+                R.id.menu_search -> {
+                    isSearch = true
+                    invalidateOptionsMenu()
+                }
+                R.id.menu_clear -> {
+                    et_search.setText("")
+                }
+            }
+            return@setOnMenuItemClickListener true
+        }
+        et_search.addTextChangedListener {
+
+            documentsAdapter?.searchDocs(et_search.text.toString())
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        toolbar_documents.inflateMenu(R.menu.menu_search)
+        val search = menu?.findItem(R.id.menu_search)
+        val clear = menu?.findItem(R.id.menu_clear)
+        clear?.isVisible = isSearch
+        search?.isVisible = !isSearch
+        if (isSearch) {
+            toolbar_documents.title = ""
+            et_search.visibility = View.VISIBLE
+        } else {
+            toolbar_documents.title = "Documents"
+            et_search.visibility = View.GONE
+        }
+        return true
+    }
+
+
     private fun setRecyclerView() {
-        documentsList = fetchDocuments(arrayOf(MimeTypes.PDF))
-        documentsAdapter = DocumentsAdapter(this, documentsList!!,isChecked, object : IsAnyCheckedListener {
-            override fun isAnyChecked(checked: Boolean) {
-                if (checked) count += 1 else count -= 1
-                // show action mode here
-                isChecked = checked
-                if(!isChecked) {
-                    for (i in 0 until documentsList!!.size) {
-                        if (documentsList!![i].isChecked) {
-                            isChecked = true
-                            break
+        documentsList = fetchDocuments(mimeTypes!!)
+        documentsAdapter =
+            DocumentsAdapter(this, documentsList!!,documentsList!! ,isChecked, object : IsAnyCheckedListener {
+                override fun isAnyChecked(checked: Boolean) {
+                    if (checked) count += 1 else count -= 1
+                    // show action mode here
+                    isChecked = checked
+                    if (!isChecked) {
+                        for (i in 0 until documentsList!!.size) {
+                            if (documentsList!![i].isChecked) {
+                                isChecked = true
+                                break
+                            }
                         }
                     }
+                    documentsAdapter?.setChecked(isChecked)
+                    documentsAdapter?.notifyDataSetChanged()
+                    if (isChecked) showActionMode(count)
+                    else hideActionMode()
                 }
-                documentsAdapter?.setChecked(isChecked)
-                documentsAdapter?.notifyDataSetChanged()
-                if (isChecked) showActionMode(count)
-                else hideActionMode()
-            }
 
-        },object :OnFileSelectedListener{
-            override fun onFileSelected(filePath: String) {
-                val selectedFilesList = ArrayList<String>()
-                selectedFilesList.add(filePath)
-                val intent = Intent()
-                intent.putExtra("files_path",selectedFilesList)
-                setResult(Activity.RESULT_OK,intent)
-                finish()
-            }
+            }, object : OnFileSelectedListener {
+                override fun onFileSelected(filePath: String) {
+                    val selectedFilesList = ArrayList<String>()
+                    selectedFilesList.add(filePath)
+                    val intent = Intent()
+                    intent.putExtra("files_path", selectedFilesList)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
 
-        })
+            },multiSelect)
         documentsAdapter?.setHasStableIds(true)
         rv_documents.layoutManager = LinearLayoutManager(this)
         rv_documents.adapter = documentsAdapter
@@ -130,7 +179,6 @@ class DocumentsActivity : BaseActivity() {
 
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.menu_mulitple_select, menu)
-
             return true
         }
 

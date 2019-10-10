@@ -32,12 +32,12 @@
                 android:visibility="gone"
                 android:elevation="@dimen/_1sdp"
                 android:src="@drawable/ic_checked"
-                android:layout_width="@dimen/_16sdp"
-                android:layout_height="@dimen/_16sdp"
+                android:layout_width="@dimen/_18sdp"
+                android:layout_height="@dimen/_18sdp"
                 android:layout_margin="@dimen/_5sdp"
                 android:scaleType="centerCrop"
                 android:background="@drawable/bg_white_circle"
-                android:layout_gravity="end|bottom"/>
+                android:layout_gravity="top|bottom"/>
         </FrameLayout>
     </LinearLayout>
 </layout>
