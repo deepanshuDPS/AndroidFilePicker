@@ -46,6 +46,10 @@ class ImagesAdapter(
         holder.binding.ivImage.layoutParams.height = width
         holder.binding.ivImage.layoutParams.width = width
         holder.binding.ivImage.invalidate()
+        if(imagesModel.fileType == 1)
+            holder.binding.ivVideo.visibility =View.VISIBLE
+        else
+            holder.binding.ivVideo.visibility =View.GONE
 
         if (isChecked) {
             holder.binding.ibCheck.visibility = View.VISIBLE

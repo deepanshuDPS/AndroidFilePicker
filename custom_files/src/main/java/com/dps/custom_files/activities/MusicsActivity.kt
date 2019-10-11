@@ -1,48 +1,44 @@
 package com.dps.custom_files.activities
 
-import android.os.Build
-import android.os.Bundle
-import com.dps.custom_files.R
-import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUEST_CODE
-
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.ActionMode
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dps.custom_files.R
 import com.dps.custom_files.adapters.DocumentsAdapter
+import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUEST_CODE
 import com.dps.custom_files.app_helper.CustomIntent
 import com.dps.custom_files.app_helper.MimeTypes
 import com.dps.custom_files.listeners.IsAnyCheckedListener
 import com.dps.custom_files.listeners.OnFileSelectedListener
 import com.dps.custom_files.models.DocumentModel
-import kotlinx.android.synthetic.main.activity_documents.*
+import kotlinx.android.synthetic.main.activity_musics.*
 
-class DocumentsActivity : BaseActivity() {
-
-    private var mimeTypes: Array<String>?=null
-    private var documentsAdapter: DocumentsAdapter? = null
-    private var documentsList: ArrayList<DocumentModel>? = null
+class MusicsActivity : BaseActivity() {
+    
+    private var musicsAdapter: DocumentsAdapter? = null
+    private var musicsList: ArrayList<DocumentModel>? = null
     private var count = 0
     private var actionMode: ActionMode? = null
     private var isChecked = false
     private var isSearch = false
     private var multiSelect = false
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_documents)
-        setSupportActionBar(toolbar_documents)
-
-        mimeTypes = intent.getStringArrayExtra(CustomIntent.SELECTED_TYPES)
+        setContentView(R.layout.activity_musics)
+        setSupportActionBar(toolbar_musics)
         val action = intent.action
         multiSelect = (action!=null && action == CustomIntent.ALLOW_MULTIPLE_SELECTION)
-
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkForPermissions(
                 WRITE_EXTERNAL_STORAGE,
                 READ_EXTERNAL_STORAGE
@@ -57,14 +53,14 @@ class DocumentsActivity : BaseActivity() {
         } else
             setRecyclerView()
 
-        toolbar_documents.setNavigationOnClickListener {
+        toolbar_musics.setNavigationOnClickListener {
             if (isSearch) {
                 isSearch = false
                 invalidateOptionsMenu()
             } else onBackPressed()
         }
 
-        toolbar_documents.setOnMenuItemClickListener {
+        toolbar_musics.setOnMenuItemClickListener {
 
             when (it.itemId) {
                 R.id.menu_search -> {
@@ -78,46 +74,45 @@ class DocumentsActivity : BaseActivity() {
             return@setOnMenuItemClickListener true
         }
         et_search.addTextChangedListener {
-
-            documentsAdapter?.searchDocs(et_search.text.toString())
+            musicsAdapter?.searchDocs(it.toString())
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        toolbar_documents.inflateMenu(R.menu.menu_search)
+        toolbar_musics.inflateMenu(R.menu.menu_search)
         val search = menu?.findItem(R.id.menu_search)
         val clear = menu?.findItem(R.id.menu_clear)
         clear?.isVisible = isSearch
         search?.isVisible = !isSearch
         if (isSearch) {
-            toolbar_documents.title = ""
+            toolbar_musics.title = ""
             et_search.visibility = View.VISIBLE
         } else {
-            toolbar_documents.setTitle(R.string.documents)
+            toolbar_musics.setTitle(R.string.music_files)
             et_search.visibility = View.GONE
         }
         return true
     }
 
-
     private fun setRecyclerView() {
-        documentsList = fetchDocuments(mimeTypes!!)
-        documentsAdapter =
-            DocumentsAdapter(this, documentsList!!,documentsList!! ,isChecked, object : IsAnyCheckedListener {
+        musicsList = fetchDocuments(arrayOf(MimeTypes.AUDIO_MP3,MimeTypes.AUDIO_OGG,MimeTypes.AUDIO_WAV))
+        musicsAdapter =
+            DocumentsAdapter(this, musicsList!!,musicsList!! ,isChecked, object :
+                IsAnyCheckedListener {
                 override fun isAnyChecked(checked: Boolean) {
                     if (checked) count += 1 else count -= 1
                     // show action mode here
                     isChecked = checked
                     if (!isChecked) {
-                        for (i in 0 until documentsList!!.size) {
-                            if (documentsList!![i].isChecked) {
+                        for (i in 0 until musicsList!!.size) {
+                            if (musicsList!![i].isChecked) {
                                 isChecked = true
                                 break
                             }
                         }
                     }
-                    documentsAdapter?.setChecked(isChecked)
-                    documentsAdapter?.notifyDataSetChanged()
+                    musicsAdapter?.setChecked(isChecked)
+                    musicsAdapter?.notifyDataSetChanged()
                     if (isChecked) showActionMode(count)
                     else hideActionMode()
                 }
@@ -133,11 +128,11 @@ class DocumentsActivity : BaseActivity() {
                 }
 
             },multiSelect)
-        documentsAdapter?.setHasStableIds(true)
-        rv_documents.layoutManager = LinearLayoutManager(this)
-        rv_documents.adapter = documentsAdapter
+        musicsAdapter?.setHasStableIds(true)
+        rv_musics.layoutManager = LinearLayoutManager(this)
+        rv_musics.adapter = musicsAdapter
     }
-
+    
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -161,7 +156,7 @@ class DocumentsActivity : BaseActivity() {
 
     private fun showActionMode(count: Int) {
         if (actionMode == null)
-            actionMode = this@DocumentsActivity.startSupportActionMode(ActionBarCallback())
+            actionMode = this@MusicsActivity.startSupportActionMode(ActionBarCallback())
 
         actionMode?.title = "$count Selected"
     }
@@ -190,7 +185,7 @@ class DocumentsActivity : BaseActivity() {
         override fun onDestroyActionMode(mode: ActionMode?) {
             mode?.finish()
             count = 0
-            documentsAdapter?.clearAllChecked()
+            musicsAdapter?.clearAllChecked()
             hideActionMode()
         }
     }
@@ -198,7 +193,7 @@ class DocumentsActivity : BaseActivity() {
     private fun getSelectedFiles(): ArrayList<String> {
 
         val selectedFilesList = ArrayList<String>()
-        for (i in documentsList!!)
+        for (i in musicsList!!)
             if (i.isChecked)
                 selectedFilesList.add(i.filePath)
         return selectedFilesList

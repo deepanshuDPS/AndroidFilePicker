@@ -12,21 +12,25 @@ import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUES
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dps.custom_files.adapters.GalleryAdapter
 import com.dps.custom_files.app_helper.AppConstants.GALLERY_IMAGES_REQUEST_CODE
-import com.dps.custom_files.databinding.ActivityImagesGalleryBinding
+import com.dps.custom_files.app_helper.CustomIntent
+import com.dps.custom_files.databinding.ActivityGalleryBinding
 import com.dps.custom_files.listeners.OnAlbumClickListener
 
 
-class ImagesGalleryActivity : BaseActivity() {
+class GalleryActivity : BaseActivity() {
 
-    private var binding: ActivityImagesGalleryBinding? = null
+    private var binding: ActivityGalleryBinding? = null
     private var multiSelect = false
+    private var typeOfChoice = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_images_gallery)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_gallery)
 
         val action = intent.action
-        multiSelect = (action != null && action == Intent.EXTRA_ALLOW_MULTIPLE)
+        multiSelect = (action != null && action == CustomIntent.ALLOW_MULTIPLE_SELECTION)
+        val type = intent.type
+        typeOfChoice = (type != null && type == CustomIntent.PICK_IMAGES_ONLY)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkForPermissions(
                 WRITE_EXTERNAL_STORAGE,
@@ -48,18 +52,20 @@ class ImagesGalleryActivity : BaseActivity() {
     }
 
     private fun setRecyclerView() {
+        val albums = if(typeOfChoice) fetchImagesAlbums() else fetchGallery()
         val width = getDeviceWidth() / 2 - 4
         val galleryAdapter =
-            GalleryAdapter(this, fetchImagesAlbums(), width, object : OnAlbumClickListener {
+            GalleryAdapter(this, albums, width, object : OnAlbumClickListener {
                 override fun onAlbumClick(albumID: String, albumName: String) {
                     val bundle = Bundle()
                     bundle.putString("album_id", albumID)
                     bundle.putString("album_name", albumName)
                     bundle.putBoolean("is_multiple", multiSelect)
+                    bundle.putBoolean("only_images",typeOfChoice)
                     //switchActivity(AlbumsImagesActivity::class.java,bundle)
                     startActivityForResult(
                         Intent(
-                            this@ImagesGalleryActivity,
+                            this@GalleryActivity,
                             AlbumsImagesActivity::class.java
                         ).putExtras(bundle), GALLERY_IMAGES_REQUEST_CODE
                     )
@@ -67,7 +73,7 @@ class ImagesGalleryActivity : BaseActivity() {
 
             })
         binding?.apply {
-            rvAlbums.layoutManager = GridLayoutManager(this@ImagesGalleryActivity, 2)
+            rvAlbums.layoutManager = GridLayoutManager(this@GalleryActivity, 2)
             rvAlbums.adapter = galleryAdapter
         }
     }

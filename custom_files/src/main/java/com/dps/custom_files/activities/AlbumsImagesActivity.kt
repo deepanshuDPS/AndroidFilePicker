@@ -1,7 +1,9 @@
 package com.dps.custom_files.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.database.Cursor
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
@@ -19,7 +21,7 @@ import com.dps.custom_files.listeners.OnMultipleFilesSelectionListener
 import com.dps.custom_files.models.ImagesModel
 import kotlin.collections.ArrayList
 
-
+@SuppressLint("Recycle")
 class AlbumsImagesActivity : BaseActivity() {
 
     private var multiSelect = false
@@ -35,14 +37,177 @@ class AlbumsImagesActivity : BaseActivity() {
         setSupportActionBar(binding?.toolbarImages)
         supportActionBar?.title = intent.extras?.getString("album_name")
 
-        multiSelect = intent.getBooleanExtra("is_multiple",false)
+        multiSelect = intent.getBooleanExtra("is_multiple", false)
 
         binding?.toolbarImages?.setNavigationOnClickListener {
             onBackPressed()
         }
+        if(intent.getBooleanExtra("only_images",false))
+            addImagesOnly(fetchImagesOnly()!!)
+        else {
+            val imagesCursor = fetchImagesOnly()
+            val videosCursor = fetchVideosOnly()
+            if (imagesCursor != null && videosCursor != null)
+                mergeBoth(imagesCursor, videosCursor)
+            else if (imagesCursor != null)
+                addImagesOnly(imagesCursor)
+            else if (videosCursor != null)
+                addVideosOnly(videosCursor)
 
+        }
+    }
 
+    private fun addVideosOnly(videosCursor: Cursor) {
         val width = getDeviceWidth() / 3 - 2
+        var previousDate = "null"
+        allImages = LinkedHashMap()
+        allDates = ArrayList()
+        while(videosCursor.moveToNext()){
+            val timeInMillisVideo: Long =
+                videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)).toLong() * 1000
+            val videoPath = videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATA))
+            val date = Utilities.getDateFromData(timeInMillisVideo)
+            val size = allImages?.size
+            if (size == 0 || date != previousDate) {
+                allDates?.add(date)
+                allImages!![date] = ArrayList()
+                allImages!![date]?.add(ImagesModel(width, videoPath, false,1))
+            } else
+                allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,1))
+
+            previousDate = date
+        }
+    }
+
+    private fun addImagesOnly(imagesCursor: Cursor) {
+        val width = getDeviceWidth() / 3 - 2
+        var previousDate = "null"
+        allImages = LinkedHashMap()
+        allDates = ArrayList()
+        while( imagesCursor.moveToNext()){
+            val timeInMillisImage: Long =
+                imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)).toLong() * 1000
+            val imagePath = imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATA))
+            val date = Utilities.getDateFromData(timeInMillisImage)
+            val size = allImages?.size
+            if (size == 0 || date != previousDate) {
+                allDates?.add(date)
+                allImages!![date] = ArrayList()
+                allImages!![date]?.add(ImagesModel(width, imagePath, false,0))
+            } else
+                allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,0))
+
+            previousDate = date
+        }
+    }
+
+    private fun mergeBoth(imagesCursor: Cursor, videosCursor: Cursor) {
+        val width = getDeviceWidth() / 3 - 2
+        var previousDate = "null"
+        allImages = LinkedHashMap()
+        allDates = ArrayList()
+        var isVideoExist = videosCursor.moveToNext()
+        var isImageExist = imagesCursor.moveToNext()
+        while (isImageExist && isVideoExist) {
+            val timeInMillisImage: Long = imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)).toLong() * 1000
+            val timeInMillisVideo: Long = videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)).toLong() * 1000
+            if (timeInMillisImage > timeInMillisVideo) {
+                //insert image
+                val imagePath = imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATA))
+                val date = Utilities.getDateFromData(timeInMillisImage)
+                val size = allImages?.size
+                if (size == 0 || date != previousDate) {
+                    allDates?.add(date)
+                    allImages!![date] = ArrayList()
+                    allImages!![date]?.add(ImagesModel(width, imagePath, false,0))
+                } else
+                    allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,0))
+
+                previousDate = date
+
+                isImageExist = imagesCursor.moveToNext()
+            } else {
+                //insert video
+                val videoPath =
+                    videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATA))
+                val date = Utilities.getDateFromData(timeInMillisVideo)
+                val size = allImages?.size
+                if (size == 0 || date != previousDate) {
+                    allDates?.add(date)
+                    allImages!![date] = ArrayList()
+                    allImages!![date]?.add(ImagesModel(width, videoPath, false,1))
+                } else
+                    allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,1))
+
+                previousDate = date
+
+                isVideoExist = videosCursor.moveToNext()
+            }
+        }
+
+        while (isImageExist) {
+            //insert image
+            val timeInMillisImage: Long =
+                imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED)).toLong() * 1000
+            val imagePath =
+                imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATA))
+            val date = Utilities.getDateFromData(timeInMillisImage)
+            val size = allImages?.size
+            if (size == 0 || date != previousDate) {
+                allDates?.add(date)
+                allImages!![date] = ArrayList()
+                allImages!![date]?.add(ImagesModel(width, imagePath, false,0))
+            } else
+                allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,0))
+
+            previousDate = date
+            isImageExist = imagesCursor.moveToNext()
+        }
+
+        while (isVideoExist) {
+            //insert video
+            val timeInMillisVideo: Long =
+                videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)).toLong() * 1000
+            val videoPath =
+                videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATA))
+            val date = Utilities.getDateFromData(timeInMillisVideo)
+            val size = allImages?.size
+            if (size == 0 || date != previousDate) {
+                allDates?.add(date)
+                allImages!![date] = ArrayList()
+                allImages!![date]?.add(ImagesModel(width, videoPath, false,1))
+            } else
+                allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,1))
+            previousDate = date
+            isVideoExist = videosCursor.moveToNext()
+        }
+
+        imagesCursor.close()
+        videosCursor.close()
+    }
+
+    private fun fetchVideosOnly(): Cursor? {
+        val imagesUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val selection =
+            MediaStore.Images.Media.BUCKET_ID + "='${intent.extras?.getString("album_id")}'"
+        val orderBy = "${MediaStore.Video.Media.DATE_MODIFIED} DESC"
+        val albumsVideosCursor = contentResolver.query(
+            imagesUri,
+            arrayOf(
+                MediaStore.Video.Media.DATA,
+                MediaStore.Video.Media.DATE_MODIFIED
+            ),
+            selection,
+            null,
+            orderBy
+        )
+
+        return if (albumsVideosCursor?.count == 0) null
+        else albumsVideosCursor
+    }
+
+    private fun fetchImagesOnly(): Cursor? {
+
         val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val selection =
             MediaStore.Images.Media.BUCKET_ID + "='${intent.extras?.getString("album_id")}'"
@@ -57,8 +222,10 @@ class AlbumsImagesActivity : BaseActivity() {
             null,
             orderBy
         )
+        return if (albumsImagesCursor?.count == 0) null
+        else albumsImagesCursor
 
-        var previousDate = "null"
+        /*var previousDate = "null"
         allImages = LinkedHashMap()
         allDates = ArrayList()
 
@@ -84,8 +251,7 @@ class AlbumsImagesActivity : BaseActivity() {
                 previousDate = date
             }
             albumsImagesCursor.close()
-        }
-
+        }*/
     }
 
 
@@ -114,11 +280,12 @@ class AlbumsImagesActivity : BaseActivity() {
                     val selectedFilesList = ArrayList<String>()
                     selectedFilesList.add(filePath)
                     val intent = Intent()
-                    intent.putExtra("files_path",selectedFilesList)
-                    setResult(Activity.RESULT_OK,intent)
+                    intent.putExtra("files_path", selectedFilesList)
+                    setResult(Activity.RESULT_OK, intent)
                     finish()
                 }
-            },multiSelect)
+            }, multiSelect
+        )
 
         binding?.apply {
             datesAdapter?.setHasStableIds(true)
@@ -150,8 +317,8 @@ class AlbumsImagesActivity : BaseActivity() {
 
             // multiple files selected action here
             val intent = Intent()
-            intent.putExtra("files_path",getSelectedFiles())
-            setResult(Activity.RESULT_OK,intent)
+            intent.putExtra("files_path", getSelectedFiles())
+            setResult(Activity.RESULT_OK, intent)
             finish()
             return true
         }

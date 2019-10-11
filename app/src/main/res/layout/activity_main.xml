@@ -20,7 +20,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_5sdp"
+        android:text="Images Gallery"
+        android:onClick="onImgGalleryClick"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
         android:text="Documents"
         android:onClick="onDocClick"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:text="Music Files"
+        android:onClick="onMusicClick"/>
 
 </LinearLayout>

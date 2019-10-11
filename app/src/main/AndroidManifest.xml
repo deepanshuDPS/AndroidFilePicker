@@ -23,7 +23,7 @@
         </activity>
 
         <activity android:name="com.dps.custom_files.activities.DocumentsActivity"/>
-        <activity android:name="com.dps.custom_files.activities.ImagesGalleryActivity" />
+        <activity android:name="com.dps.custom_files.activities.GalleryActivity" />
     </application>
 
 

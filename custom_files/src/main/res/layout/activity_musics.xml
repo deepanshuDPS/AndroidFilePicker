@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,14 +9,14 @@
 
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_documents"
+        android:id="@+id/toolbar_musics"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:elevation="@dimen/_2sdp"
         app:contentInsetStartWithNavigation="0dp"
         app:navigationIcon="@drawable/ic_back"
-        app:title="@string/documents"
+        app:title="@string/music_files"
         app:titleTextColor="@android:color/white">
 
         <EditText
@@ -34,7 +33,7 @@
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_documents"
+        android:id="@+id/rv_musics"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:descendantFocusability="blocksDescendants" />

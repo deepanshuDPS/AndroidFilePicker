@@ -16,10 +16,10 @@
     </style>
 
     <style name="ActionModeStyle" parent="Widget.AppCompat.ActionMode">
-        <item name="titleTextStyle">@style/CustomeActionModeTextStyle</item>
+        <item name="titleTextStyle">@style/CustomActionModeTextStyle</item>
     </style>
 
-    <style name="CustomeActionModeTextStyle" parent="TextAppearance.AppCompat.Widget.ActionMode.Title">
+    <style name="CustomActionModeTextStyle" parent="TextAppearance.AppCompat.Widget.ActionMode.Title">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">18sp</item>
     </style>

@@ -35,16 +35,17 @@
                     android:background="@android:color/white"
                     android:scaleType="centerCrop"
                     app:imageSize="@{album.imageSize}"
-                    app:path="@{album.imagePath}" />
+                    app:path="@{album.lastFilePath}"
+                    app:fileType="@{album.fileType}"/>
                 </FrameLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
             android:layout_gravity="bottom"
-            android:layout_margin="@dimen/_3sdp"
+            android:layout_margin="@dimen/_4sdp"
             android:background="@drawable/ic_folder"
             app:setAlbumIcon="@{album.albumName}" />
 
@@ -52,7 +53,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginStart="@dimen/_26sdp"
+            android:maxLines="1"
+            android:layout_marginStart="@dimen/_24sdp"
             android:layout_marginBottom="@dimen/_4sdp"
             android:text="@{album.albumName}"
             android:textColor="@android:color/white"
@@ -63,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/_3sdp"
-            android:text="@{album.fileCount}"
+            android:text="@{String.valueOf(album.fileCount)}"
             android:textColor="@android:color/white"
             android:textSize="@dimen/_12sdp" />
 

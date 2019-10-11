@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.dps.custom_files.activities.DocumentsActivity
-import com.dps.custom_files.activities.ImagesGalleryActivity
+import com.dps.custom_files.activities.GalleryActivity
+import com.dps.custom_files.activities.MusicsActivity
+import com.dps.custom_files.app_helper.CustomIntent
 import com.dps.custom_files.app_helper.MimeTypes
 
 class MainActivity : AppCompatActivity() {
@@ -18,25 +20,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onGalleryClick(view: View) {
-        val intent = Intent(this, ImagesGalleryActivity::class.java)
-        intent.action = Intent.EXTRA_ALLOW_MULTIPLE
+        val intent = Intent(this, GalleryActivity::class.java)
+        intent.action = CustomIntent.ALLOW_MULTIPLE_SELECTION
+        startActivityForResult(intent, 101)
+    }
+
+    fun onImgGalleryClick(view: View) {
+        val intent = Intent(this, GalleryActivity::class.java)
+        intent.action = CustomIntent.ALLOW_MULTIPLE_SELECTION
+        intent.type = CustomIntent.PICK_IMAGES_ONLY
         startActivityForResult(intent, 202)
     }
 
     fun onDocClick(view: View) {
         val intent = Intent(this, DocumentsActivity::class.java)
-        intent.action = Intent.EXTRA_ALLOW_MULTIPLE
-        intent.putExtra(MimeTypes.SELECTED_TYPES,arrayOf(MimeTypes.PDF,MimeTypes.IMAGE_PNG))
+        intent.action = CustomIntent.ALLOW_MULTIPLE_SELECTION
+        intent.putExtra(CustomIntent.SELECTED_TYPES,arrayOf(MimeTypes.PDF,MimeTypes.IMAGE_PNG))
         startActivityForResult(intent, 303)
+    }
+
+    fun onMusicClick(view: View) {
+        val intent = Intent(this, MusicsActivity::class.java)
+        intent.action = CustomIntent.ALLOW_MULTIPLE_SELECTION
+        startActivityForResult(intent, 404)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data != null && resultCode == Activity.RESULT_OK) {
-            if (requestCode == 202)
-                Toast.makeText(this@MainActivity,"Files Selected: "+data.getStringArrayListExtra("files_path").size,Toast.LENGTH_LONG).show()
-            else if(requestCode == 303)
-                Toast.makeText(this@MainActivity,"Files Selected: "+data.getStringArrayListExtra("files_path").size,Toast.LENGTH_LONG).show()
+            Toast.makeText(this@MainActivity,"Files Selected: "+data.getStringArrayListExtra("files_path").size,Toast.LENGTH_LONG).show()
         }
     }
+
+
 }

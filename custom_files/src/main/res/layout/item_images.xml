@@ -25,7 +25,18 @@
                 android:background="@android:color/white"
                 android:scaleType="centerCrop"
                 app:imageSize="@{image.imageSize}"
-                app:path="@{image.imagePath}" />
+                app:path="@{image.imagePath}"
+                app:fileType="@{image.fileType}"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_video"
+                android:elevation="@dimen/_1sdp"
+                android:src="@drawable/ic_video_cam"
+                android:layout_width="@dimen/_14sdp"
+                android:layout_height="@dimen/_14sdp"
+                android:layout_margin="@dimen/_5sdp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="start|bottom"/>
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/ib_check"
