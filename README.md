@@ -64,7 +64,14 @@ buildToolsVersion "28.0.3"
 implementation 'androidx.appcompat:appcompat:1.1.0'
 implementation 'com.google.android.material:material:1.0.0'
 ```
-3) Now, Lets start making custom theme for the Activities you want to use from My Library
+
+3) Add Read and Write permissions also add to your "AndroidManifest.xml" to read writes in android storage
+```
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+4) Now, Lets start making custom theme for the Activities you want to use from My Library
 
 ```
 <!-- Here Make Parent to Our "CustomAppTheme" To get your theme compatible with our Activities -->
@@ -82,14 +89,26 @@ implementation 'com.google.android.material:material:1.0.0'
   
 ```
 
-4) Now choose Any Activity as mentioned above and add to your AndroidManifest.xml file with your customize theme "YourTheme"
+5) Now choose Any Activity as mentioned above and add to your "AndroidManifest.xml" file with your customize theme "YourTheme"
 ```
+<!-- To use DocumentsAcitvity -->
 <activity android:name="com.dps.custom_files.activities.DocumentsActivity"
-android:theme="@style/YourTheme"/>
+	android:theme="@style/YourTheme"/>
+
+<!-- To use GalleryAcitvity you have to add two activities one includes for perticular Album -->
+<activity android:name="com.dps.custom_files.activities.GalleryActivity"
+	android:theme="@style/YourTheme"/>
+
+<activity android:name="com.dps.custom_files.activities.AlbumsImagesActivity"
+            android:theme="@style/YourTheme"/>
+
+<!-- To use MusicsAcitvity -->
+<activity android:name="com.dps.custom_files.activities.MusicsAcitvity"
+	android:theme="@style/YourTheme"/>
 
 ```
 
-5) Now lets start activity for getting custom files
+6) Now lets start activity for getting custom files
 
 ```
 Intent intent = new Intent(this, DocumentsActivity.class);
@@ -99,7 +118,7 @@ startActivityForResult(intent, REQUEST_CODE);
 
 ```
 
-6) How to get data onActivityResult()
+7) How to get data onActivityResult()
 
 ```
 if (data != null && resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE) {
@@ -113,7 +132,7 @@ if (data != null && resultCode == Activity.RESULT_OK && requestCode == REQUEST_C
 }
 ```
 
-7) Now how to Access Gallery Files and Audio Files (File Getting steps are same as Step-6)
+8) Now how to Access Gallery Files and Audio Files (File Getting steps are same as Step-7)
 
 ```
 // How to access gallery files
