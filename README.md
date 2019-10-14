@@ -83,7 +83,7 @@ implementation 'com.google.android.material:material:1.0.0'
   <item name="colorAccent">@color/colorAccent</item>
 </style>
 
-<!-- If you want to change toolbar title color, icons of toolbar etc. then you have to add this in your color.xml-->
+<!-- If you want to change toolbar title color, icons color of toolbar etc. then you have to add this in your color.xml-->
   
 <color name="colorOnSecondary">YourColorHere</color>
   
@@ -113,8 +113,10 @@ implementation 'com.google.android.material:material:1.0.0'
 ```
 Intent intent = new Intent(this, DocumentsActivity.class);
 intent.setAction(CustomIntent.ALLOW_MULTIPLE_SELECTION);  // for allowing multiple selection at a time (optional)
-intent.putExtra(CustomIntent.SELECTED_TYPES,new String[]{MimeTypes.PDF,MimeTypes.IMAGE_PNG});  // giving array of mime types of string
+intent.putExtra(CustomIntent.SELECTED_TYPES,new String[]{MimeTypes.PDF,MimeTypes.IMAGE_PNG});  // giving array of mime types of string (Adding MimeTypes is compulsory)
 startActivityForResult(intent, REQUEST_CODE);
+
+/* Given MimeTypes:- DOC, DOC_X, XLS, XLS_X, PPT, PPT_X, HTML, TXT, IMAGE_PNG, IMAGE_JPEG, IMAGE_BMP, IMAGE_GIF, IMAGE_SVG, VIDEO_MP4,  VIDEO_AVI, VIDEO_MPEG, VIDEO_MOV, VIDEO_3GP, AUDIO_MP3, AUDIO_OGG and AUDIO_WAV */
 
 ```
 
@@ -147,4 +149,15 @@ intent.setAction(CustomIntent.ALLOW_MULTIPLE_SELECTION);  // for allowing multip
 startActivityForResult(intent, REQUEST_CODE);
 
 ```
+
+***Here are some screenshots of the gallery, documents and music Activities with custom themes A/C to your application***
+
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_1.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_2.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_3.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_4.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_5.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_6.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_7.jpg?raw=true)
+![alt text](https://github.com/deepanshuDPS/docs_and_pics/blob/master/custom_files_8.jpg?raw=true)
 
