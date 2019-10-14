@@ -7,11 +7,11 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorSecondary" >@android:color/white</item>
+        <item name="android:textColorSecondary" >@color/colorOnSecondary</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/colorPrimaryDark</item>
         <item name="actionModeStyle">@style/ActionModeStyle</item>
-        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="actionMenuTextColor">@color/colorOnSecondary</item>
         <item name="actionModeCloseDrawable">@drawable/ic_back</item>
     </style>
 
@@ -20,7 +20,7 @@
     </style>
 
     <style name="CustomActionModeTextStyle" parent="TextAppearance.AppCompat.Widget.ActionMode.Title">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/colorOnSecondary</item>
         <item name="android:textSize">18sp</item>
     </style>
 </resources>

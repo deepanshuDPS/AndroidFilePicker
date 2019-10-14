@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.dps.custom_files.R
 import com.dps.custom_files.adapters.DatesAdapter
+import com.dps.custom_files.app_helper.AppConstants
 import com.dps.custom_files.app_helper.Utilities
+import com.dps.custom_files.app_helper.AppConstants.FileType
 import com.dps.custom_files.databinding.ActivityAlbumsImagesBinding
 import com.dps.custom_files.listeners.OnFileSelectedListener
 import com.dps.custom_files.listeners.OnMultipleFilesSelectionListener
@@ -34,15 +36,15 @@ class AlbumsImagesActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_albums_images)
+
         setSupportActionBar(binding?.toolbarImages)
         supportActionBar?.title = intent.extras?.getString("album_name")
 
         multiSelect = intent.getBooleanExtra("is_multiple", false)
 
-        binding?.toolbarImages?.setNavigationOnClickListener {
-            onBackPressed()
-        }
-        if(intent.getBooleanExtra("only_images",false))
+        binding?.toolbarImages?.setNavigationOnClickListener { onBackPressed() }
+
+        if(intent.getBooleanExtra(AppConstants.ONLY_IMAGES,false))
             addImagesOnly(fetchImagesOnly()!!)
         else {
             val imagesCursor = fetchImagesOnly()
@@ -71,9 +73,9 @@ class AlbumsImagesActivity : BaseActivity() {
             if (size == 0 || date != previousDate) {
                 allDates?.add(date)
                 allImages!![date] = ArrayList()
-                allImages!![date]?.add(ImagesModel(width, videoPath, false,1))
+                allImages!![date]?.add(ImagesModel(width, videoPath, false,FileType.VIDEO))
             } else
-                allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,1))
+                allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,FileType.VIDEO))
 
             previousDate = date
         }
@@ -93,9 +95,9 @@ class AlbumsImagesActivity : BaseActivity() {
             if (size == 0 || date != previousDate) {
                 allDates?.add(date)
                 allImages!![date] = ArrayList()
-                allImages!![date]?.add(ImagesModel(width, imagePath, false,0))
+                allImages!![date]?.add(ImagesModel(width, imagePath, false,FileType.IMAGE))
             } else
-                allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,0))
+                allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,FileType.IMAGE))
 
             previousDate = date
         }
@@ -106,6 +108,8 @@ class AlbumsImagesActivity : BaseActivity() {
         var previousDate = "null"
         allImages = LinkedHashMap()
         allDates = ArrayList()
+
+        // merge sorting from here
         var isVideoExist = videosCursor.moveToNext()
         var isImageExist = imagesCursor.moveToNext()
         while (isImageExist && isVideoExist) {
@@ -113,19 +117,20 @@ class AlbumsImagesActivity : BaseActivity() {
             val timeInMillisVideo: Long = videosCursor.getString(videosCursor.getColumnIndex(MediaStore.Video.Media.DATE_MODIFIED)).toLong() * 1000
             if (timeInMillisImage > timeInMillisVideo) {
                 //insert image
-                val imagePath = imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATA))
+                val imagePath =
+                    imagesCursor.getString(imagesCursor.getColumnIndex(MediaStore.Images.Media.DATA))
                 val date = Utilities.getDateFromData(timeInMillisImage)
                 val size = allImages?.size
                 if (size == 0 || date != previousDate) {
                     allDates?.add(date)
                     allImages!![date] = ArrayList()
-                    allImages!![date]?.add(ImagesModel(width, imagePath, false,0))
+                    allImages!![date]?.add(ImagesModel(width, imagePath, false,FileType.IMAGE))
                 } else
-                    allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,0))
+                    allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,FileType.IMAGE))
 
                 previousDate = date
-
                 isImageExist = imagesCursor.moveToNext()
+
             } else {
                 //insert video
                 val videoPath =
@@ -135,13 +140,13 @@ class AlbumsImagesActivity : BaseActivity() {
                 if (size == 0 || date != previousDate) {
                     allDates?.add(date)
                     allImages!![date] = ArrayList()
-                    allImages!![date]?.add(ImagesModel(width, videoPath, false,1))
+                    allImages!![date]?.add(ImagesModel(width, videoPath, false,FileType.VIDEO))
                 } else
-                    allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,1))
+                    allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,FileType.VIDEO))
 
                 previousDate = date
-
                 isVideoExist = videosCursor.moveToNext()
+
             }
         }
 
@@ -156,9 +161,9 @@ class AlbumsImagesActivity : BaseActivity() {
             if (size == 0 || date != previousDate) {
                 allDates?.add(date)
                 allImages!![date] = ArrayList()
-                allImages!![date]?.add(ImagesModel(width, imagePath, false,0))
+                allImages!![date]?.add(ImagesModel(width, imagePath, false,FileType.IMAGE))
             } else
-                allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,0))
+                allImages!![previousDate]?.add(ImagesModel(width, imagePath, false,FileType.IMAGE))
 
             previousDate = date
             isImageExist = imagesCursor.moveToNext()
@@ -175,9 +180,9 @@ class AlbumsImagesActivity : BaseActivity() {
             if (size == 0 || date != previousDate) {
                 allDates?.add(date)
                 allImages!![date] = ArrayList()
-                allImages!![date]?.add(ImagesModel(width, videoPath, false,1))
+                allImages!![date]?.add(ImagesModel(width, videoPath, false,FileType.VIDEO))
             } else
-                allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,1))
+                allImages!![previousDate]?.add(ImagesModel(width, videoPath, false,FileType.VIDEO))
             previousDate = date
             isVideoExist = videosCursor.moveToNext()
         }
@@ -187,12 +192,12 @@ class AlbumsImagesActivity : BaseActivity() {
     }
 
     private fun fetchVideosOnly(): Cursor? {
-        val imagesUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val videosUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val selection =
-            MediaStore.Images.Media.BUCKET_ID + "='${intent.extras?.getString("album_id")}'"
+            MediaStore.Video.Media.BUCKET_ID + "='${intent.extras?.getString("album_id")}'"
         val orderBy = "${MediaStore.Video.Media.DATE_MODIFIED} DESC"
         val albumsVideosCursor = contentResolver.query(
-            imagesUri,
+            videosUri,
             arrayOf(
                 MediaStore.Video.Media.DATA,
                 MediaStore.Video.Media.DATE_MODIFIED
@@ -263,26 +268,21 @@ class AlbumsImagesActivity : BaseActivity() {
     private fun setRecyclerView() {
         val width = getDeviceWidth() / 3 - 2
         datesAdapter = DatesAdapter(
-            this,
+            this@AlbumsImagesActivity,
             allDates!!,
             allImages!!,
             width,
             object : OnMultipleFilesSelectionListener {
                 override fun onMultipleFileSelected(selected: Boolean, count: Int) {
-                    if (selected)
-                        showActionMode(count)
-                    else
-                        hideActionMode()
+                    if (selected) showActionMode(count)
+                    else hideActionMode()
                 }
             },
             object : OnFileSelectedListener {
                 override fun onFileSelected(filePath: String) {
                     val selectedFilesList = ArrayList<String>()
                     selectedFilesList.add(filePath)
-                    val intent = Intent()
-                    intent.putExtra("files_path", selectedFilesList)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
+                    setIntentAndFinish(selectedFilesList)
                 }
             }, multiSelect
         )
@@ -314,12 +314,8 @@ class AlbumsImagesActivity : BaseActivity() {
     // action mode for select multiple
     inner class ActionBarCallback : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem): Boolean {
-
             // multiple files selected action here
-            val intent = Intent()
-            intent.putExtra("files_path", getSelectedFiles())
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+            setIntentAndFinish(getSelectedFiles())
             return true
         }
 
@@ -356,4 +352,5 @@ class AlbumsImagesActivity : BaseActivity() {
         }
         return selectedFilesList
     }
+
 }

@@ -17,16 +17,16 @@
         app:contentInsetStartWithNavigation="0dp"
         app:navigationIcon="@drawable/ic_back"
         app:title="@string/music_files"
-        app:titleTextColor="@android:color/white">
+        app:titleTextColor="@color/colorOnSecondary">
 
         <EditText
             android:id="@+id/et_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/white"
-            android:hint="@string/search"
+            android:backgroundTint="@color/colorOnSecondary"
+        android:hint="@string/search"
             android:maxLines="1"
-            android:textColor="@android:color/white"
+            android:textColor="@color/colorOnSecondary"
             android:textColorHint="@color/white_trans"
             android:textSize="18sp"
             android:visibility="gone" />

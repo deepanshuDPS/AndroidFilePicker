@@ -1,5 +1,6 @@
 package com.dps.custom_files.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -19,6 +20,8 @@ import kotlin.collections.ArrayList
 import com.bumptech.glide.Glide
 import java.io.File
 import android.widget.LinearLayout
+import com.dps.custom_files.app_helper.AppConstants
+import com.dps.custom_files.app_helper.AppConstants.FileType
 import com.dps.custom_files.app_helper.MimeTypes
 import com.dps.custom_files.app_helper.Utilities
 import com.dps.custom_files.models.DocumentModel
@@ -30,7 +33,6 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-
     }
 
 
@@ -54,7 +56,7 @@ abstract class BaseActivity : AppCompatActivity() {
         return permissionGranted
     }
 
-    fun switchActivity(destinationActivity: Class<*>) {
+    /*fun switchActivity(destinationActivity: Class<*>) {
         startActivity(Intent(this, destinationActivity))
     }
 
@@ -63,9 +65,9 @@ abstract class BaseActivity : AppCompatActivity() {
             startActivity(Intent(this, destinationActivity).putExtras(bundle))
         else
             switchActivity(destinationActivity)
-    }
+    }*/
 
-    fun displayToast(message: String) {
+    private fun displayToast(message: String) {
         Toast.makeText(this@BaseActivity, message, Toast.LENGTH_LONG).show()
     }
 
@@ -73,6 +75,12 @@ abstract class BaseActivity : AppCompatActivity() {
         displayToast(getString(stringRes))
     }
 
+    fun setIntentAndFinish(selectedFilesList:ArrayList<String>){
+        val intent = Intent()
+        intent.putExtra(AppConstants.FILES_PATH, selectedFilesList)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+    }
 
     companion object {
         @BindingAdapter(value = ["path", "imageSize", "fileType"], requireAll = false)
@@ -81,12 +89,12 @@ abstract class BaseActivity : AppCompatActivity() {
             imageView: ImageView,
             path: String,
             imageSize: Int,
-            fileType: Int
+            fileType: FileType
         ) {
             /*val bitmap  = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path,bitmapOptions), thumbSize, thumbSize)
             imageView.setImageBitmap(bitmap)*/
             val file = File(path)
-            if (fileType == 0)
+            if (fileType == FileType.IMAGE)
                 Glide.with(imageView).asBitmap().load(file).placeholder(R.drawable.bg_default_image)
                     .override(imageSize, imageSize).into(imageView)
             else
@@ -99,11 +107,11 @@ abstract class BaseActivity : AppCompatActivity() {
         @BindingAdapter("setAlbumIcon")
         @JvmStatic
         fun setAlbumIcon(imageView: ImageView, albumName: String) {
-            if (albumName.toLowerCase(Locale.ENGLISH).contains("camera"))
-                imageView.setBackgroundResource(R.drawable.ic_camera)
-            else if (albumName.toLowerCase(Locale.ENGLISH).contains("video"))
-                imageView.setBackgroundResource(R.drawable.ic_video_cam)
-            else imageView.setBackgroundResource(R.drawable.ic_folder)
+            when {
+                albumName.toLowerCase(Locale.ENGLISH).contains("camera") -> imageView.setBackgroundResource(R.drawable.ic_camera)
+                albumName.toLowerCase(Locale.ENGLISH).contains("video") -> imageView.setBackgroundResource(R.drawable.ic_video_cam)
+                else -> imageView.setBackgroundResource(R.drawable.ic_folder)
+            }
         }
 
         @BindingAdapter("setFileIcon")
@@ -151,13 +159,14 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun fetchImagesAlbums(): ArrayList<AlbumModel> {
+
+        val width = getDeviceWidth() / 2 - 4
         val albumsList = ArrayList<AlbumModel>()
         val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val countColumnName = "count"
         val projection = arrayOf(
             MediaStore.Images.ImageColumns.BUCKET_ID,
-            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
-            MediaStore.Images.ImageColumns.DATE_TAKEN
+            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
         )
         val bucketGroupBy =
             "1) GROUP BY ${MediaStore.Images.ImageColumns.BUCKET_ID}, (${MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME}"
@@ -202,16 +211,8 @@ abstract class BaseActivity : AppCompatActivity() {
                     count = countCursor.getInt(countCursor.getColumnIndexOrThrow(countColumnName))
                     countCursor.close()
                 }
-                val albumModel = AlbumModel(
-                    bucketId,
-                    bucketName,
-                    lastFilePath,
-                    count,
-                    getDeviceWidth() / 2 - 4,
-                    0
-                )
                 Log.d("Album", "Id $bucketId Name $bucketName Count $count")
-                albumsList.add(albumModel)
+                albumsList.add(AlbumModel(bucketId, bucketName, lastFilePath, count,width, FileType.IMAGE))
             }
             cursor.close()
         }
@@ -221,7 +222,7 @@ abstract class BaseActivity : AppCompatActivity() {
     fun fetchDocuments(mimeTypeList: Array<String>): ArrayList<DocumentModel> {
         val documentList = ArrayList<DocumentModel>()
 
-/*val pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf")*/
+        /*val pdf = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf")*/
 
         var nArgs = "("
         for (i in mimeTypeList)
@@ -238,7 +239,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val selection = MediaStore.Files.FileColumns.MIME_TYPE + " IN $nArgs "
 
         val orderBy = "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC"
-// val args = arrayOf(pdf, doc, docx, xls, xlsx, ppt, pptx, txt, html)
+        // val args = arrayOf(pdf, doc, docx, xls, xlsx, ppt, pptx, txt, html)
 
         val filesCursor =
             contentResolver.query(filesUri, projection, selection, mimeTypeList, orderBy)
@@ -284,6 +285,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun fetchGallery():ArrayList<AlbumModel>{
+
         val width = getDeviceWidth() / 2 - 4
         val allAlbums = ArrayList<AlbumModel>()
         val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -335,21 +337,23 @@ abstract class BaseActivity : AppCompatActivity() {
                     count = countCursor.getInt(countCursor.getColumnIndexOrThrow(countColumnName))
                     countCursor.close()
                 }
-                allAlbums.add(AlbumModel(albumId,albumName,lastFilePath,count,width,0))
+                allAlbums.add(AlbumModel(albumId,albumName,lastFilePath,count,width,FileType.IMAGE))
             }
             cursor.close()
         }
 
+        val imagesAlbumSize = allAlbums.size
+
         val videosUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        val proj = arrayOf(
+        val projectionV = arrayOf(
             MediaStore.Video.VideoColumns.BUCKET_ID,
             MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME
         )
-        val buckGroupBy =
+        val bucketGroupByV =
             "1) GROUP BY ${MediaStore.Video.VideoColumns.BUCKET_ID}, (${MediaStore.Video.VideoColumns.BUCKET_DISPLAY_NAME}"
-        val buckOrderBy = "${MediaStore.Video.VideoColumns.DATE_MODIFIED} DESC"
+        val bucketOrderByV = "${MediaStore.Video.VideoColumns.DATE_MODIFIED} DESC"
         val cursorV =
-            contentResolver.query(videosUri, proj, buckGroupBy, null, buckOrderBy)
+            contentResolver.query(videosUri, projectionV, bucketGroupByV, null, bucketOrderByV)
 
         if(cursorV!=null){
             while (cursorV.moveToNext()){
@@ -389,7 +393,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     countCursor.close()
                 }
                 var flag = true
-                for(i in 0 until allAlbums.size){
+                for(i in 0 until imagesAlbumSize){
                     if(allAlbums[i].albumId == albumId){
                         //exist
                         allAlbums[i].fileCount+=count
@@ -397,15 +401,15 @@ abstract class BaseActivity : AppCompatActivity() {
                         break
                     }
                 }
-                if(flag) allAlbums.add(AlbumModel(albumId,albumName,lastFilePath,count,width,1))
+                if(flag) allAlbums.add(AlbumModel(albumId,albumName,lastFilePath,count,width,FileType.VIDEO))
 
 
             }
             cursorV.close()
         }
-        for(i in allAlbums){
+        /*for(i in allAlbums){
             Log.d("album_details","Name: ${i.albumName} Id:${i.albumId} Count:${i.fileCount} Path:${i.lastFilePath}")
-        }
+        }*/
         return allAlbums
     }
 

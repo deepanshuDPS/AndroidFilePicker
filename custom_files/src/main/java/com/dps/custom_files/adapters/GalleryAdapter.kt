@@ -31,7 +31,5 @@ class GalleryAdapter(private var context: Context,private var albumsList:ArrayLi
         }
     }
 
-    inner class ViewHolder(var binding: ItemGalleryAlbumBinding) : RecyclerView.ViewHolder(binding.root) {
-
-    }
+    inner class ViewHolder(var binding: ItemGalleryAlbumBinding) : RecyclerView.ViewHolder(binding.root)
 }

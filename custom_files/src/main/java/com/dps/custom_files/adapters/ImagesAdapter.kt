@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dps.custom_files.R
+import com.dps.custom_files.app_helper.AppConstants.FileType
 import com.dps.custom_files.databinding.ItemImagesBinding
 import com.dps.custom_files.listeners.IsAnyCheckedListener
 import com.dps.custom_files.listeners.OnFileSelectedListener
@@ -46,7 +47,7 @@ class ImagesAdapter(
         holder.binding.ivImage.layoutParams.height = width
         holder.binding.ivImage.layoutParams.width = width
         holder.binding.ivImage.invalidate()
-        if(imagesModel.fileType == 1)
+        if(imagesModel.fileType == FileType.VIDEO)
             holder.binding.ivVideo.visibility =View.VISIBLE
         else
             holder.binding.ivVideo.visibility =View.GONE

@@ -63,7 +63,6 @@ class DocumentsAdapter(
     }
 
     fun searchDocs(searchQuery:String){
-
         documentsSearchList = ArrayList()
         if(searchQuery != ""){
             for(i in documentsList){

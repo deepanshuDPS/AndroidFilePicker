@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.dps.custom_files.activities.DocumentsActivity
 import com.dps.custom_files.activities.GalleryActivity
 import com.dps.custom_files.activities.MusicsActivity
+import com.dps.custom_files.app_helper.AppConstants
 import com.dps.custom_files.app_helper.CustomIntent
 import com.dps.custom_files.app_helper.MimeTypes
 
@@ -48,7 +49,8 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data != null && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this@MainActivity,"Files Selected: "+data.getStringArrayListExtra("files_path").size,Toast.LENGTH_LONG).show()
+            Toast.makeText(this@MainActivity,"Files Selected: "+data.getStringArrayListExtra(
+                AppConstants.FILES_PATH).size,Toast.LENGTH_LONG).show()
         }
     }
 

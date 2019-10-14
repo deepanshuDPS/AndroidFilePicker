@@ -2,8 +2,6 @@ package com.dps.custom_files.activities
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.app.Activity
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -121,10 +119,7 @@ class MusicsActivity : BaseActivity() {
                 override fun onFileSelected(filePath: String) {
                     val selectedFilesList = ArrayList<String>()
                     selectedFilesList.add(filePath)
-                    val intent = Intent()
-                    intent.putExtra("files_path", selectedFilesList)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
+                    setIntentAndFinish(selectedFilesList)
                 }
 
             },multiSelect)
@@ -166,10 +161,7 @@ class MusicsActivity : BaseActivity() {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem): Boolean {
 
             // multiple files selected action here
-            val intent = Intent()
-            intent.putExtra("files_path", getSelectedFiles())
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+            setIntentAndFinish(getSelectedFiles())
             return true
         }
 
@@ -191,7 +183,6 @@ class MusicsActivity : BaseActivity() {
     }
 
     private fun getSelectedFiles(): ArrayList<String> {
-
         val selectedFilesList = ArrayList<String>()
         for (i in musicsList!!)
             if (i.isChecked)

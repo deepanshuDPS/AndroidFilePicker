@@ -16,8 +16,8 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dps.custom_files.adapters.DocumentsAdapter
+import com.dps.custom_files.app_helper.AppConstants
 import com.dps.custom_files.app_helper.CustomIntent
-import com.dps.custom_files.app_helper.MimeTypes
 import com.dps.custom_files.listeners.IsAnyCheckedListener
 import com.dps.custom_files.listeners.OnFileSelectedListener
 import com.dps.custom_files.models.DocumentModel
@@ -78,8 +78,7 @@ class DocumentsActivity : BaseActivity() {
             return@setOnMenuItemClickListener true
         }
         et_search.addTextChangedListener {
-
-            documentsAdapter?.searchDocs(et_search.text.toString())
+            documentsAdapter?.searchDocs(it.toString())
         }
     }
 
@@ -101,41 +100,43 @@ class DocumentsActivity : BaseActivity() {
 
 
     private fun setRecyclerView() {
-        documentsList = fetchDocuments(mimeTypes!!)
-        documentsAdapter =
-            DocumentsAdapter(this, documentsList!!,documentsList!! ,isChecked, object : IsAnyCheckedListener {
-                override fun isAnyChecked(checked: Boolean) {
-                    if (checked) count += 1 else count -= 1
-                    // show action mode here
-                    isChecked = checked
-                    if (!isChecked) {
-                        for (i in 0 until documentsList!!.size) {
-                            if (documentsList!![i].isChecked) {
-                                isChecked = true
-                                break
+        if(mimeTypes?.isNotEmpty()!!){
+            documentsList = fetchDocuments(mimeTypes!!)
+            documentsAdapter =
+                DocumentsAdapter(this, documentsList!!,documentsList!! ,isChecked, object : IsAnyCheckedListener {
+                    override fun isAnyChecked(checked: Boolean) {
+                        if (checked) count += 1 else count -= 1
+                        // show action mode here
+                        isChecked = checked
+                        if (!isChecked) {
+                            for (i in 0 until documentsList!!.size) {
+                                if (documentsList!![i].isChecked) {
+                                    isChecked = true
+                                    break
+                                }
                             }
                         }
+                        documentsAdapter?.setChecked(isChecked)
+                        documentsAdapter?.notifyDataSetChanged()
+                        if (isChecked) showActionMode(count)
+                        else hideActionMode()
                     }
-                    documentsAdapter?.setChecked(isChecked)
-                    documentsAdapter?.notifyDataSetChanged()
-                    if (isChecked) showActionMode(count)
-                    else hideActionMode()
-                }
 
-            }, object : OnFileSelectedListener {
-                override fun onFileSelected(filePath: String) {
-                    val selectedFilesList = ArrayList<String>()
-                    selectedFilesList.add(filePath)
-                    val intent = Intent()
-                    intent.putExtra("files_path", selectedFilesList)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                }
+                }, object : OnFileSelectedListener {
+                    override fun onFileSelected(filePath: String) {
+                        val selectedFilesList = ArrayList<String>()
+                        selectedFilesList.add(filePath)
+                        setIntentAndFinish(selectedFilesList)
+                    }
 
-            },multiSelect)
-        documentsAdapter?.setHasStableIds(true)
-        rv_documents.layoutManager = LinearLayoutManager(this)
-        rv_documents.adapter = documentsAdapter
+                },multiSelect)
+            documentsAdapter?.setHasStableIds(true)
+            rv_documents.layoutManager = LinearLayoutManager(this)
+            rv_documents.adapter = documentsAdapter
+        } else{
+            displayToast(R.string.no_file_type_mentioned)
+        }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -169,12 +170,8 @@ class DocumentsActivity : BaseActivity() {
     // action mode for select multiple
     inner class ActionBarCallback : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem): Boolean {
-
             // multiple files selected action here
-            val intent = Intent()
-            intent.putExtra("files_path", getSelectedFiles())
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+            setIntentAndFinish(getSelectedFiles())
             return true
         }
 
@@ -196,7 +193,6 @@ class DocumentsActivity : BaseActivity() {
     }
 
     private fun getSelectedFiles(): ArrayList<String> {
-
         val selectedFilesList = ArrayList<String>()
         for (i in documentsList!!)
             if (i.isChecked)

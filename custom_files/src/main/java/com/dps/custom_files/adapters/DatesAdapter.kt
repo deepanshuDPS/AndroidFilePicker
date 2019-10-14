@@ -13,8 +13,6 @@ import com.dps.custom_files.listeners.IsAnyCheckedListener
 import com.dps.custom_files.listeners.OnFileSelectedListener
 import com.dps.custom_files.listeners.OnMultipleFilesSelectionListener
 import com.dps.custom_files.models.ImagesModel
-import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.recyclerview.widget.RecyclerView.ItemAnimator
 
 class DatesAdapter(
     private var context: Context,
@@ -81,7 +79,6 @@ class DatesAdapter(
             imagesAdapter.setHasStableIds(true)
             rvImages.adapter = imagesAdapter
             rvImages.layoutManager = GridLayoutManager(context, 3)
-
         }
     }
 

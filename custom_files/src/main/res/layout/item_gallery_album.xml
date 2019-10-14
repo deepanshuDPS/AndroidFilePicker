@@ -42,10 +42,10 @@
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_15sdp"
+            android:layout_width="@dimen/_14sdp"
+            android:layout_height="@dimen/_14sdp"
             android:layout_gravity="bottom"
-            android:layout_margin="@dimen/_4sdp"
+            android:layout_margin="@dimen/_5sdp"
             android:background="@drawable/ic_folder"
             app:setAlbumIcon="@{album.albumName}" />
 

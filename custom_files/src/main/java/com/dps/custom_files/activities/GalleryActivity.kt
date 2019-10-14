@@ -11,6 +11,7 @@ import android.os.Build
 import com.dps.custom_files.app_helper.AppConstants.READ_WRITE_PERMISSION_REQUEST_CODE
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dps.custom_files.adapters.GalleryAdapter
+import com.dps.custom_files.app_helper.AppConstants
 import com.dps.custom_files.app_helper.AppConstants.GALLERY_IMAGES_REQUEST_CODE
 import com.dps.custom_files.app_helper.CustomIntent
 import com.dps.custom_files.databinding.ActivityGalleryBinding
@@ -52,7 +53,7 @@ class GalleryActivity : BaseActivity() {
     }
 
     private fun setRecyclerView() {
-        val albums = if(typeOfChoice) fetchImagesAlbums() else fetchGallery()
+        val albums = if (typeOfChoice) fetchImagesAlbums() else fetchGallery()
         val width = getDeviceWidth() / 2 - 4
         val galleryAdapter =
             GalleryAdapter(this, albums, width, object : OnAlbumClickListener {
@@ -61,7 +62,7 @@ class GalleryActivity : BaseActivity() {
                     bundle.putString("album_id", albumID)
                     bundle.putString("album_name", albumName)
                     bundle.putBoolean("is_multiple", multiSelect)
-                    bundle.putBoolean("only_images",typeOfChoice)
+                    bundle.putBoolean(AppConstants.ONLY_IMAGES, typeOfChoice)
                     //switchActivity(AlbumsImagesActivity::class.java,bundle)
                     startActivityForResult(
                         Intent(
@@ -100,7 +101,10 @@ class GalleryActivity : BaseActivity() {
         if (data != null && resultCode == Activity.RESULT_OK) {
             if (requestCode == GALLERY_IMAGES_REQUEST_CODE) {
                 val intent = Intent()
-                intent.putExtra("files_path", data.extras?.getStringArrayList("files_path"))
+                intent.putExtra(
+                    AppConstants.FILES_PATH,
+                    data.extras?.getStringArrayList(AppConstants.FILES_PATH)
+                )
                 setResult(Activity.RESULT_OK, intent)
                 finish()
             }
