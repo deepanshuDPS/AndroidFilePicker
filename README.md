@@ -1,4 +1,6 @@
-[![](https://jitpack.io/v/deepanshuDPS/CustomFiles.svg)](https://jitpack.io/#deepanshuDPS/CustomFiles)
+[](https://jitpack.io/v/deepanshuDPS/AndroidFilePicker.svg)
+
+# Implementation and Dependency #
 
 Step 1. Add the JitPack repository to your build file
 
@@ -27,19 +29,19 @@ allprojects {
 Step 2. Add the dependency
 ```
 dependencies {
-  implementation 'com.github.deepanshuDPS:CustomFiles:1.0.0'
+  implementation 'com.github.deepanshuDPS:AndroidFilePicker:1.0.1'
 }
 ```
   
   OR
 ```
 <dependency>
-  <groupId>com.github.deepanshuDPS</groupId>
-  <artifactId>CustomFiles</artifactId>
-  <version>1.0.0</version>
+	    <groupId>com.github.deepanshuDPS</groupId>
+	    <artifactId>AndroidFilePicker</artifactId>
+	    <version>1.0.1</version>
 </dependency>
 ```
-
+# Usage #
 NOW LET'S SEE HOW TO USE THIS LIBRARY 
 
 There are 3 types of Activities in this library:
@@ -92,18 +94,18 @@ implementation 'com.google.android.material:material:1.0.0'
 5) Now choose Any Activity as mentioned above and add to your "AndroidManifest.xml" file with your customize theme "YourTheme"
 ```
 <!-- To use DocumentsAcitvity -->
-<activity android:name="com.dps.custom_files.activities.DocumentsActivity"
+<activity android:name="com.dps.custom_file_picker.activities.DocumentsActivity"
 	android:theme="@style/YourTheme"/>
 
 <!-- To use GalleryAcitvity you have to add two activities one includes for perticular Album -->
-<activity android:name="com.dps.custom_files.activities.GalleryActivity"
+<activity android:name="com.dps.custom_file_picker.activities.GalleryActivity"
 	android:theme="@style/YourTheme"/>
 
-<activity android:name="com.dps.custom_files.activities.AlbumsImagesActivity"
+<activity android:name="com.dps.custom_file_picker.activities.AlbumsImagesActivity"
             android:theme="@style/YourTheme"/>
 
 <!-- To use MusicsAcitvity -->
-<activity android:name="com.dps.custom_files.activities.MusicsAcitvity"
+<activity android:name="com.dps.custom_file_picker.activities.MusicsAcitvity"
 	android:theme="@style/YourTheme"/>
 
 ```
