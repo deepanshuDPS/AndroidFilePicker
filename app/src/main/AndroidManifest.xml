@@ -22,8 +22,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.dps.custom_files.activities.DocumentsActivity"/>
-        <activity android:name="com.dps.custom_files.activities.GalleryActivity" />
+        <activity android:name="com.dps.custom_file_picker.activities.DocumentsActivity"
+            />
+        <activity android:name="com.dps.custom_file_picker.activities.GalleryActivity" />
     </application>
 
 

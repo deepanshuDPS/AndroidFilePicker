@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        tools:context="com.dps.custom_file_picker.activities.GalleryActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_gallery"
+            app:contentInsetStartWithNavigation="0dp"
+            android:elevation="@dimen/_2sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="@string/gallery"
+            app:titleTextColor="@color/colorOnSecondary" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_albums"
+                android:descendantFocusability="blocksDescendants"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+    </LinearLayout>
+</layout>

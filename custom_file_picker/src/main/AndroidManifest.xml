@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.dps.custom_file_picker">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application>
+        <activity
+            android:name="com.dps.custom_file_picker.activities.GalleryActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name="com.dps.custom_file_picker.activities.MusicsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name="com.dps.custom_file_picker.activities.DocumentsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name="com.dps.custom_file_picker.activities.AlbumsImagesActivity"
+            android:screenOrientation="portrait"/>
+    </application>
+
+</manifest>

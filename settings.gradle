@@ -1,2 +1,2 @@
-include ':app', ':custom_files'
+include ':app', ':custom_file_picker'
 rootProject.name='CustomFiles'

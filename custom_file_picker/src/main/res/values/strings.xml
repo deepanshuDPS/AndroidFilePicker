@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">CustomFiles</string>
+    <string name="gallery">Gallery</string>
+
+    <string name="permissions_not_granted">"All Permissions Not Granted"</string>
+    <string name="documents">Documents</string>
+    <string name="ok">OK</string>
+    <string name="search">Search</string>
+    <string name="clear">Clear</string>
+    <string name="music_files">Music Files</string>
+    <string name="no_file_type_mentioned">No file type mentioned</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

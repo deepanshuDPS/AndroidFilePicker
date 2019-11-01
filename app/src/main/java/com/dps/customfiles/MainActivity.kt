@@ -6,12 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.dps.custom_files.activities.DocumentsActivity
-import com.dps.custom_files.activities.GalleryActivity
-import com.dps.custom_files.activities.MusicsActivity
-import com.dps.custom_files.app_helper.AppConstants
-import com.dps.custom_files.app_helper.CustomIntent
-import com.dps.custom_files.app_helper.MimeTypes
+import com.dps.custom_file_picker.activities.DocumentsActivity
+import com.dps.custom_file_picker.activities.GalleryActivity
+import com.dps.custom_file_picker.activities.MusicsActivity
+import com.dps.custom_file_picker.app_helper.AppConstants
+import com.dps.custom_file_picker.app_helper.CustomIntent
+import com.dps.custom_file_picker.app_helper.MimeTypes
 
 class MainActivity : AppCompatActivity() {
 
